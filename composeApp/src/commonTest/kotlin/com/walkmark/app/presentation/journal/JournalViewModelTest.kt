@@ -1,4 +1,4 @@
-package com.walkmark.app.presentation.journal
+﻿package com.walkmark.app.presentation.journal
 
 import app.cash.turbine.test
 import com.walkmark.app.core.model.SampleItem
@@ -14,7 +14,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
-@OOptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class JournalViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 

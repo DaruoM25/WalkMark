@@ -1,8 +1,8 @@
-package com.walkmark.app
+﻿package com.walkmark.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.ractivity.compose.setContent
+import androidx.activity.compose.setContent
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

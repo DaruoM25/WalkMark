@@ -1,9 +1,9 @@
-package com.walkmark.app.core.model
+﻿package com.walkmark.app.core.model
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-Class SampleItemTest {
+class SampleItemTest {
     @Test
     fun testSampleItemCreation() {
         val item = SampleItem(id = 1, title = "Morning Walk", createdAt = 1000L)

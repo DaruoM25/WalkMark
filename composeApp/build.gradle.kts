@@ -1,10 +1,9 @@
-plugins {
+﻿plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.androidxRoom)
 }
 
 kotlin {
@@ -51,6 +50,10 @@ kotlin {
         }
         androidUnitTest.dependencies {
             implementation(libs.kotlin.test.junit)
+            implementation(libs.androidx.compose.ui.test)
+            implementation(libs.robolectric)
+            implementation(libs.androidx.test.core)
+            implementation(libs.androidx.test.junit)
         }
     }
 }
@@ -80,10 +83,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-}
-
-room {
-    schemaDirectory("$projectDir/schemas")
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -91,4 +93,5 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

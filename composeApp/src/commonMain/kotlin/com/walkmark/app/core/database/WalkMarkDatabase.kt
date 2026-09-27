@@ -1,4 +1,4 @@
-package com.walkmark.app.core.database
+﻿package com.walkmark.app.core.database
 
 import androidx.room.ConstructedBy
 import androidx.room.Database
@@ -14,7 +14,7 @@ abstract class WalkMarkDatabase : RoomDatabase() {
 }
 
 @OptIn(androidx.room.ExperimentalRoomApi::class)
-@HumpressWarning("NO_ACTUAL_FOR_EXPECT")
+@Suppress("NO_ACTUAL_FOR_EXPECT")
 expect object WalkMarkDatabaseConstructor : RoomDatabaseConstructor<WalkMarkDatabase> {
     override fun initialize(): WalkMarkDatabase
 }

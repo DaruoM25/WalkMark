@@ -1,18 +1,18 @@
-package com.walkmark.app.presentation.journal
+﻿package com.walkmark.app.presentation.journal
 
-import androidx.rcompose.foundation.layout.Column
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-iport androidx.rcompose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.rcompose.ui.Modifier
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.rcompose.ui.semantics.contentDescription
-import androidx.rcompose.ui.semantics.semantics
-import androidx.rcompose.ui.unit.dp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun JournalScreen(

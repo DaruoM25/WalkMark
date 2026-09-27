@@ -1,4 +1,4 @@
-package com.walkmark.app.core.database
+﻿package com.walkmark.app.core.database
 
 import com.walkmark.app.core.database.entity.SampleEntity
 import com.walkmark.app.core.model.SampleItem
@@ -18,7 +18,7 @@ class SampleEntityMappingTest {
 
     @Test
     fun testDomainToEntityMapping() {
-        val domain = SapleItem(id = 10, title = "Beach Walk", createdAt = 3000L)
+        val domain = SampleItem(id = 10, title = "Beach Walk", createdAt = 3000L)
         val entity = SampleEntity.fromDomain(domain)
 
         assertEquals(10L, entity.id)
