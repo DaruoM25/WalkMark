@@ -1,13 +1,17 @@
 # WalkMark — Module Architecture
 
 ## Gradle Module Structure
-- `:composeApp` - [IMPLEMENTED]
-  - `commonMain`: Domain models, Room KMP database & DAOs, Presentation UI & ViewModels.
-  - `androidMain`: Android Activity, Application, and Platform Room builder.
-  - `iosMain`: iOS UIViewController bridge, Platform Room builder.
+- `:composeApp` (Canonical single-module project; `shared` is strictly forbidden) - [VERIFIED]
+  - `src/commonMain/kotlin/com/walkmark/app/`:
+    - `ui/`: Compose Multiplatform screens, adaptive layouts, and theming - [VERIFIED]
+    - `domain/`: Pure domain models (`Walk`, `Waypoint`, `NotePhoto`) - [VERIFIED]
+    - `data/`: Room KMP entities, DAOs, and serialization DTOs - [VERIFIED]
+    - `location/`: Multiplatform GPS location tracking abstractions - [VERIFIED]
+  - `src/androidMain/`: Android Activity, Application, and Android SQLite database builder - [VERIFIED]
+  - `src/iosMain/`: iOS UIViewController bridge, iOS SQLite database builder - [VERIFIED]
 
-## Future Feature Modularization - [PLANNED]
-- GPS & Background Location Tracking  - [PLANNED]
-- MapLibre Compose + OSM rendering  - [PLANNED]
-- RevenueCat Monetization & 4th-save paywall  - [PLANNED]
-- Photo & Note Attachments  - [PLANNED]
+## Future Feature Implementations - [PLANNED]
+- GPS Background Service and Foreground Notification - [PLANNED]
+- MapLibre Compose map rendering and OSM offline tiles - [PLANNED]
+- RevenueCat 3-walk quota hard paywall modal - [PLANNED]
+

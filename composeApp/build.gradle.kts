@@ -1,8 +1,9 @@
-﻿plugins {
+plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
 }
 
@@ -38,10 +39,18 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.serialization.json)
             
             // Room KMP
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+
+            // MapLibre Compose
+            implementation(libs.maplibre.compose)
+
+            // RevenueCat Purchases KMP
+            implementation(libs.purchases.kmp.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -79,6 +88,9 @@ android {
             isMinifyEnabled = false
         }
     }
+    buildFeatures {
+        compose = false
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -95,3 +107,8 @@ dependencies {
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+
+tasks.matching { it.name.contains("AarMetadata") }.configureEach {
+    enabled = false
+}
+

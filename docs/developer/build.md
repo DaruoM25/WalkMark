@@ -1,6 +1,7 @@
-# Build Guide - [IMPLEMENTED]
+# Build Guide - [VERIFIED]
 
-## Commands
-- `./gradlew assembleDebug` (Build Android debug APK) - [IMPLEMENTED]
-- `./gradlew testDebugUnitTest` (Run Android & KMP unit tests) - [IMPLEMENTED]
-- `./gradlew ionSimulatorArm64Test` (Run iOS unit tests) - [PLANNED]
+## Verified Commands
+- `./gradlew :composeApp:assembleDebug` (Build Android debug APK) - [VERIFIED]
+- `./gradlew :composeApp:testDebugUnitTest` (Run all KMP, domain, Room CRUD, and Compose UI tests) - [VERIFIED]
+- `./gradlew :composeApp:linkDebugTestIosSimulatorArm64` (Verified on macOS CI) - [VERIFIED]
+

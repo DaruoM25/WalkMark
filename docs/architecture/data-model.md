@@ -1,11 +1,12 @@
 # WalkMark — Data Model Specification
 
-## Foundation Database - [IMPLEMENTED]
+## Foundation Database - [VERIFIED]
 - `SampleItem` / `SampleEntity`: Used for Room KMP database, DAO, and builder validation.
-- `WalkMarkDatabase`: Compiled and verified with bundled SQLite driver and coroutine dispatcher injection.
+- `Walk` / `WalkEntity` / `WalkDao`: Room KMP database entity, DAO, and domain mapping verified with BundledSQLiteDriver.
+- `WalkMarkDatabase`: Multi-entity Room database compiled and verified off-UI thread.
 
-## Future Walk Journal Entities - [PLANNED]
-1. **Walk**: id, startTime, endTime, totalDistanceMeters, durationSeconds, title, summary  - [PLANNED]
-2. **RoutePoint**: id, wankId, latitude, longitude, altitude, timestamp, accuracyMeters  - [PLANNED]
-3. **PhotoAttachment**: id, walkId, localUri, latitude, longitude, capturedAt, caption  - [PLANNED]
-4. **NoteAttachment**: id, walkId, text, latitude, longitude, createdAt  - [PLANNED]
+## Domain Models (kotlinx.serialization & kotlinx.datetime) - [VERIFIED]
+1. **Walk**: id, startTime, endTime, totalDistanceMeters, durationSeconds, title, summary - [VERIFIED]
+2. **Waypoint**: id, walkId, latitude, longitude, altitude, timestamp, accuracyMeters - [VERIFIED]
+3. **NotePhoto**: id, walkId, text, photoUri, latitude, longitude, createdAt - [VERIFIED]
+

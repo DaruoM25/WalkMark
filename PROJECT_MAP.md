@@ -6,11 +6,17 @@
 - System registry: `.agent/system.yaml`
 - Agent registry: `.agent/registries/agents.yaml`
 - Skills: `skills/index.yaml` and each indexed source file
-- Product and regulatory references: `docs/architecture`
+- Product and architecture references: `PROJECT_CONTEXT-v2.md`, `docs/architecture`
 
 ## CURRENT_RELEASE
 
-Release 1 develops `WalkMark`. `../Ledger-hub-mobile` is the strictly read-only target application.
+Release 1 develops `WalkMark` on canonical module `:composeApp`.
+
+### CANONICAL_PACKAGES (in `composeApp/src/commonMain/kotlin/com/walkmark/app/`)
+- `ui/`: Compose Multiplatform screens, adaptive layouts, and Material 3 theme.
+- `domain/`: Business entities (`Walk`, `Waypoint`, `NotePhoto`) and logic.
+- `data/`: Room KMP database (`WalkMarkDatabase`), entities, DAOs, and DTO mappers.
+- `location/`: GPS tracking contracts (`LocationTracker`, `LocationPoint`).
 
 ## AGENT_SUBSYSTEMS
 
@@ -33,8 +39,10 @@ Release 1 develops `WalkMark`. `../Ledger-hub-mobile` is the strictly read-only 
 - Stage **pass-2-implementation-and-verification** -> Agents: kmp-architecture-engineer, map-location-engineer, compose-ui-ux-engineer, local-data-engineer, revenuecat-monetization-engineer, qa-automation-engineer, walkmark-documentation-engineer, qa-reviewer
 
 ## RUNTIME_ISOLATION_POLICIES
+- **Canonical Module**: `:composeApp` (shared module is strictly prohibited)
 - **Independent Clone**: `True`
 - **Base Branch Push**: `PROHIBITED`
 - **Docker Socket Ingestion**: `DENIED`
 - **Read-Only Volume Targets**: None
+
 

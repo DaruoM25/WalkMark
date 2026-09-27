@@ -1,6 +1,7 @@
-﻿package com.walkmark.app
+package com.walkmark.app
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.walkmark.app.presentation.journal.JournalScreen
@@ -28,7 +29,9 @@ class JournalComposeRealUiTest {
 
         // Assert container and header nodes are displayed
         composeTestRule.onNodeWithTag("journal_screen_container").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("journal_title_header").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("app_ready_header").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("app_ready_header").assertTextEquals("WalkMark: Ready for Shipaton")
         composeTestRule.onNodeWithTag("journal_subtitle").assertIsDisplayed()
     }
 }
+
