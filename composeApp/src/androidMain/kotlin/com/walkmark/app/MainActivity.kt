@@ -1,0 +1,14 @@
+package com.walkmark.app
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.ractivity.compose.setContent
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            App()
+        }
+    }
+}

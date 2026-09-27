@@ -1,4 +1,4 @@
-# Getting Started with WalkMark
+# Getting Started with WalkMark - [PLANNED]
 
 WalkMark is your private, local-first walk journal.
 - No mandatory account required.

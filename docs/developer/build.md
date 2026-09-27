@@ -1,6 +1,6 @@
-# Build Guide
+# Build Guide - [IMPLEMENTED]
 
-## Commands (Planned)
-- ./gradlew assembleDebug (Android debug build)
-- ./gradlew check (Run all unit tests and lint checks)
-- ./gradlew iosSimulatorArm64Test (Run iOS unit tests)
+## Commands
+- `./gradlew assembleDebug` (Build Android debug APK) - [IMPLEMENTED]
+- `./gradlew testDebugUnitTest` (Run Android & KMP unit tests) - [IMPLEMENTED]
+- `./gradlew ionSimulatorArm64Test` (Run iOS unit tests) - [PLANNED]

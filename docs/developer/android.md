@@ -1,7 +1,10 @@
-# Android Platform Details
+# Android Platform - [IMPLEMENTED]
 
-## Permissions & Services
-- ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION
-- FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION
-- POST_NOTIFICATIONS
-- Foreground Service for active walk recording with ongoing notification.
+## Application Baseline
+- Package: `com.walkmark.app`
+- MinSdk: 26, TargetSdk: 35 - [IMPLEMENTED]
+- MainActivity & WalkMarkApp - [IMPLEMENTED]
+
+## Future Platform Services - [PLANNED]
+- Foreground Service with `FOREGROUND_SERVICE_LOCATION` type  - [PLANNED]
+- FusedLocationProviderClient background GBS recording  - [PLANNED]
