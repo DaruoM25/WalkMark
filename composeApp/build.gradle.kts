@@ -58,6 +58,14 @@ kotlin {
             implementation(libs.androidx.test.core)
             implementation(libs.androidx.test.junit)
         }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlin.test.junit)
+            implementation(libs.androidx.test.core)
+            implementation(libs.androidx.test.junit)
+            implementation(libs.androidx.test.runner)
+            implementation(libs.kotlinx.coroutines.test)
+        }
     }
 }
 
@@ -71,6 +79,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
@@ -105,4 +114,3 @@ dependencies {
 tasks.matching { it.name.contains("AarMetadata") }.configureEach {
     enabled = false
 }
-
