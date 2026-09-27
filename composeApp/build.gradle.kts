@@ -45,12 +45,6 @@ kotlin {
             // Room KMP
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
-
-            // MapLibre Compose
-            implementation(libs.maplibre.compose)
-
-            // RevenueCat Purchases KMP
-            implementation(libs.purchases.kmp.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
