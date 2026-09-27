@@ -1,0 +1,185 @@
+schema_version: 1
+agents:
+- id: walkmark-po-orchestrator
+  source: .agent/agents/walkmark-po-orchestrator.md
+  enabled: true
+  role: Decompose product requirements into verifiable user stories.
+  protocols:
+  - 00-request-normalization
+  - 10-planning
+  - 50-verification
+  skills:
+  - kmp-clean-architecture
+  - documentation-and-user-manual
+  capabilities: []
+  criticality: critical
+  version: 1.0.0
+  owner: walkmark-po-orchestrator
+  last_verified: '2026-09-24'
+- id: kmp-architecture-engineer
+  source: .agent/agents/kmp-architecture-engineer.md
+  enabled: true
+  role: Define and maintain KMP Clean Architecture module boundaries.
+  protocols:
+  - 10-planning
+  - 20-execution
+  - 30-surgical-edit
+  skills:
+  - kmp-clean-architecture
+  - offline-first-local-storage
+  capabilities:
+  - kmp-architecture
+  criticality: critical
+  version: 1.0.0
+  owner: kmp-architecture-engineer
+  last_verified: '2026-09-24'
+- id: map-location-engineer
+  source: .agent/agents/map-location-engineer.md
+  enabled: true
+  role: Integrate MapLibre Compose and OpenStreetMap tiles.
+  protocols:
+  - 20-execution
+  - 30-surgical-edit
+  - 40-rca
+  skills:
+  - maplibre-mapping
+  - gps-background-tracking
+  - route-photo-note-modeling
+  capabilities:
+  - maplibre-rendering
+  - gps-tracking
+  criticality: high
+  version: 1.0.0
+  owner: map-location-engineer
+  last_verified: '2026-09-24'
+- id: compose-ui-ux-engineer
+  source: .agent/agents/compose-ui-ux-engineer.md
+  enabled: true
+  role: Build Compose Multiplatform Material 3 responsive UI.
+  protocols:
+  - 20-execution
+  - 30-surgical-edit
+  skills:
+  - compose-adaptive-ui
+  - route-photo-note-modeling
+  capabilities:
+  - compose-ui-design
+  - walk-modeling
+  criticality: high
+  version: 1.0.0
+  owner: compose-ui-ux-engineer
+  last_verified: '2026-09-24'
+- id: local-data-engineer
+  source: .agent/agents/local-data-engineer.md
+  enabled: true
+  role: Design and maintain Room KMP entities, DAOs, and relations.
+  protocols:
+  - 20-execution
+  - 30-surgical-edit
+  skills:
+  - room-kmp-persistence
+  - room-kmp-migrations
+  - offline-first-local-storage
+  capabilities:
+  - room-persistence
+  - room-migrations
+  - offline-storage
+  criticality: critical
+  version: 1.0.0
+  owner: local-data-engineer
+  last_verified: '2026-09-24'
+- id: revenuecat-monetization-engineer
+  source: .agent/agents/revenuecat-monetization-engineer.md
+  enabled: true
+  role: Integrate RevenueCat SDK and entitlement checking model.
+  protocols:
+  - 20-execution
+  - 30-surgical-edit
+  skills:
+  - revenuecat-hard-paywall
+  capabilities:
+  - monetization-paywall
+  criticality: high
+  version: 1.0.0
+  owner: revenuecat-monetization-engineer
+  last_verified: '2026-09-24'
+- id: qa-automation-engineer
+  source: .agent/agents/qa-automation-engineer.md
+  enabled: true
+  role: Author kotlin.test unit and integration test suites.
+  protocols:
+  - 20-execution
+  - 40-rca
+  - 50-verification
+  skills:
+  - mobile-testing
+  capabilities:
+  - test-automation
+  criticality: high
+  version: 1.0.0
+  owner: qa-automation-engineer
+  last_verified: '2026-09-24'
+- id: mobile-security-privacy-engineer
+  source: .agent/agents/mobile-security-privacy-engineer.md
+  enabled: true
+  role: Enforce local data privacy and zero-tracking baseline.
+  protocols:
+  - 10-planning
+  - 30-surgical-edit
+  - 50-verification
+  skills:
+  - mobile-privacy-local-first
+  capabilities:
+  - privacy-auditing
+  criticality: critical
+  version: 1.0.0
+  owner: mobile-security-privacy-engineer
+  last_verified: '2026-09-24'
+- id: mobile-devops-engineer
+  source: .agent/agents/mobile-devops-engineer.md
+  enabled: true
+  role: Maintain Gradle build scripts and libs.versions.toml version catalog.
+  protocols:
+  - 20-execution
+  - 30-surgical-edit
+  skills:
+  - mobile-ci-cd
+  capabilities:
+  - devops-ci
+  criticality: medium
+  version: 1.0.0
+  owner: mobile-devops-engineer
+  last_verified: '2026-09-24'
+- id: walkmark-documentation-engineer
+  source: .agent/agents/walkmark-documentation-engineer.md
+  enabled: true
+  role: Maintain technical documentation continuously under docs/architecture and
+    docs/developer.
+  protocols:
+  - 20-execution
+  - 30-surgical-edit
+  - 50-verification
+  skills:
+  - documentation-and-user-manual
+  capabilities:
+  - documentation-authoring
+  criticality: medium
+  version: 1.0.0
+  owner: walkmark-documentation-engineer
+  last_verified: '2026-09-24'
+- id: qa-reviewer
+  source: .agent/agents/qa-reviewer.md
+  enabled: true
+  role: Perform independent final review of implementations and tests.
+  protocols:
+  - 50-verification
+  - 60-skill-lifecycle
+  skills:
+  - mobile-testing
+  - documentation-and-user-manual
+  capabilities:
+  - quality-gate
+  criticality: critical
+  version: 1.0.0
+  owner: qa-reviewer
+  last_verified: '2026-09-24'

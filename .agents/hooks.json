@@ -1,0 +1,32 @@
+{
+  "blackbox-safety-guard": {
+    "enabled": true,
+    "PreToolUse": [
+      {
+        "matcher": "run_command|write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .agents/scripts/hooks/blackbox_guard.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "audit-logger": {
+    "enabled": true,
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"import sys; sys.stdout.write('{}')\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

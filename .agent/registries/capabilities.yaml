@@ -1,0 +1,44 @@
+schema_version: 1
+capabilities:
+  kmp-architecture:
+    owner: kmp-architecture-engineer
+    skill: kmp-clean-architecture
+  compose-ui-design:
+    owner: compose-ui-ux-engineer
+    skill: compose-adaptive-ui
+  maplibre-rendering:
+    owner: map-location-engineer
+    skill: maplibre-mapping
+  gps-tracking:
+    owner: map-location-engineer
+    skill: gps-background-tracking
+  room-persistence:
+    owner: local-data-engineer
+    skill: room-kmp-persistence
+  room-migrations:
+    owner: local-data-engineer
+    skill: room-kmp-migrations
+  offline-storage:
+    owner: local-data-engineer
+    skill: offline-first-local-storage
+  walk-modeling:
+    owner: compose-ui-ux-engineer
+    skill: route-photo-note-modeling
+  monetization-paywall:
+    owner: revenuecat-monetization-engineer
+    skill: revenuecat-hard-paywall
+  privacy-auditing:
+    owner: mobile-security-privacy-engineer
+    skill: mobile-privacy-local-first
+  test-automation:
+    owner: qa-automation-engineer
+    skill: mobile-testing
+  devops-ci:
+    owner: mobile-devops-engineer
+    skill: mobile-ci-cd
+  documentation-authoring:
+    owner: walkmark-documentation-engineer
+    skill: documentation-and-user-manual
+  quality-gate:
+    owner: qa-reviewer
+    skill: null

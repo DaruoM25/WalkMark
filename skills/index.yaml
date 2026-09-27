@@ -1,0 +1,351 @@
+schema_version: 1
+skills:
+- name: kmp-clean-architecture
+  file: skills/skill_kmp-clean-architecture.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: critical
+  domain: kmp-clean-architecture
+  technology: Kotlin Multiplatform / Clean Architecture
+  technology_version_range: '>=2.0.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - architecture
+  - module-boundary
+  - commonMain
+  - clean-architecture
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/overview.md
+    type: architecture-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Enforces clean domain/data/presentation layering and commonMain
+    platform separation.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: compose-adaptive-ui
+  file: skills/skill_compose-adaptive-ui.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: high
+  domain: compose-multiplatform-ui
+  technology: Compose Multiplatform / Material 3 / WindowSizeClass
+  technology_version_range: '>=1.7.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - compose
+  - adaptive
+  - layout
+  - tablet
+  - foldable
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/overview.md
+    type: architecture-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Enforces responsive Material 3 layouts across phones, tablets,
+    iPads, and foldables.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: maplibre-mapping
+  file: skills/skill_maplibre-mapping.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: high
+  domain: mapping-gis
+  technology: MapLibre Compose / OpenStreetMap
+  technology_version_range: '>=0.5.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - map
+  - maplibre
+  - osm
+  - route-render
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/overview.md
+    type: architecture-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Handles MapLibre Compose integration and OpenStreetMap raster/vector
+    tile caching.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: gps-background-tracking
+  file: skills/skill_gps-background-tracking.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: critical
+  domain: location-tracking
+  technology: Android FusedLocationProviderClient / iOS CLLocationManager
+  technology_version_range: '>=1.0.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - gps
+  - location
+  - background-tracking
+  - foreground-service
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/overview.md
+    type: architecture-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Manages battery-efficient background GPS tracking and platform
+    lifecycle.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: room-kmp-persistence
+  file: skills/skill_room-kmp-persistence.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: critical
+  domain: local-persistence
+  technology: Room KMP / SQLite
+  technology_version_range: '>=2.7.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - room
+  - database
+  - dao
+  - entity
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/data-model.md
+    type: architecture-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Governs Room KMP schema design, relations, and background dispatchers.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: room-kmp-migrations
+  file: skills/skill_room-kmp-migrations.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: critical
+  domain: database-migrations
+  technology: Room KMP AutoMigration / Migration
+  technology_version_range: '>=2.7.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - migration
+  - schema-change
+  - room-migration
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/data-model.md
+    type: architecture-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Enforces mandatory migration testing and zero data loss on
+    schema updates.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: offline-first-local-storage
+  file: skills/skill_offline-first-local-storage.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: high
+  domain: offline-first
+  technology: Local File Storage / KMP FileSystem
+  technology_version_range: '>=1.0.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - offline-first
+  - local-storage
+  - photo-storage
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/data-model.md
+    type: architecture-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Guarantees 100% offline usability with local photo and metadata
+    storage.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: route-photo-note-modeling
+  file: skills/skill_route-photo-note-modeling.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: high
+  domain: domain-modeling
+  technology: Kotlin Data Classes / Domain Models
+  technology_version_range: '>=2.0.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - walk-model
+  - photo-attachment
+  - note-attachment
+  - route-point
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/data-model.md
+    type: architecture-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Defines domain models for walks, geographic coordinates, photos,
+    and notes.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: revenuecat-hard-paywall
+  file: skills/skill_revenuecat-hard-paywall.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: critical
+  domain: monetization-quota
+  technology: RevenueCat SDK / Purchases KMP
+  technology_version_range: '>=1.0.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - revenuecat
+  - paywall
+  - subscription
+  - walk-quota
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/user-guide/subscriptions.md
+    type: product-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Enforces 3-free-walk quota and triggers hard paywall on the
+    4th save attempt.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: mobile-privacy-local-first
+  file: skills/skill_mobile-privacy-local-first.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: critical
+  domain: privacy-security
+  technology: Mobile Privacy / Zero Tracking
+  technology_version_range: '>=1.0.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - privacy
+  - permissions
+  - zero-tracking
+  - local-first
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/user-guide/privacy.md
+    type: governance
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Strict zero-tracking, no third-party analytics, no advertising
+    SDKs, minimum runtime permissions.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: mobile-testing
+  file: skills/skill_mobile-testing.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: high
+  domain: test-automation
+  technology: kotlin.test / Compose UI Test / Robolectric
+  technology_version_range: '>=2.0.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - test
+  - unit-test
+  - compose-test
+  - robolectric
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/developer/testing.md
+    type: technical-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Standardized test patterns for domain use cases, ViewModels,
+    Room DAOs, and Compose screens.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: mobile-ci-cd
+  file: skills/skill_mobile-ci-cd.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: medium
+  domain: build-ci-cd
+  technology: Gradle Version Catalogs / GitHub Actions / JDK 17
+  technology_version_range: '>=8.5'
+  valid_from: '2026-09-01'
+  triggers:
+  - gradle
+  - ci-cd
+  - version-catalog
+  - build
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/developer/build.md
+    type: devops-spec
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Gradle build configurations using libs.versions.toml and JDK
+    17 compatibility.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'
+- name: documentation-and-user-manual
+  file: skills/skill_documentation-and-user-manual.md
+  version: 1.0.0
+  status: active
+  promotion_state: active
+  knowledge_state: valid
+  criticality: high
+  domain: technical-documentation
+  technology: Markdown / Docs Structure
+  technology_version_range: '>=1.0.0'
+  valid_from: '2026-09-01'
+  triggers:
+  - docs
+  - user-manual
+  - changelog
+  - architecture-doc
+  content_checksum: uncalculated
+  source_evidence:
+  - path: docs/architecture/overview.md
+    type: governance
+    provenance: SOURCE_VERIFIED
+  compatibility_notes: Continuous documentation maintenance for architecture, developer
+    setup, user manual, and changelog.
+  revalidation_policy: on_source_change
+  depends_on: []
+  last_verified: '2026-09-24'
+  source_last_checked: '2026-09-24'

@@ -1,0 +1,187 @@
+{
+  "name": "WalkMark-bundle",
+  "description": "WalkMark - Private local-first GPS walk journaling mobile application with photos, notes, and offline maps built on Kotlin Multiplatform, Compose Multiplatform, and Room KMP.",
+  "version": "1.0.0",
+  "canonical_governance": "AGENTS.md",
+  "canonical_agents": [
+    {
+      "canonical_id": "walkmark-po-orchestrator",
+      "display_name": "WalkMark Product Owner & Orchestrator",
+      "role": "Decompose product requirements into verifiable user stories.",
+      "type": "orchestrator",
+      "criticality": "critical",
+      "approval_authority": true,
+      "skills": [
+        "kmp-clean-architecture",
+        "documentation-and-user-manual"
+      ],
+      "protocols": [
+        "00-request-normalization",
+        "10-planning",
+        "50-verification"
+      ]
+    },
+    {
+      "canonical_id": "kmp-architecture-engineer",
+      "display_name": "KMP Architecture Engineer",
+      "role": "Define and maintain KMP Clean Architecture module boundaries.",
+      "type": "specialist",
+      "criticality": "critical",
+      "approval_authority": false,
+      "skills": [
+        "kmp-clean-architecture",
+        "offline-first-local-storage"
+      ],
+      "protocols": [
+        "10-planning",
+        "20-execution",
+        "30-surgical-edit"
+      ]
+    },
+    {
+      "canonical_id": "map-location-engineer",
+      "display_name": "Map & Location Engineer",
+      "role": "Integrate MapLibre Compose and OpenStreetMap tiles.",
+      "type": "specialist",
+      "criticality": "high",
+      "approval_authority": false,
+      "skills": [
+        "maplibre-mapping",
+        "gps-background-tracking",
+        "route-photo-note-modeling"
+      ],
+      "protocols": [
+        "20-execution",
+        "30-surgical-edit",
+        "40-rca"
+      ]
+    },
+    {
+      "canonical_id": "compose-ui-ux-engineer",
+      "display_name": "Compose UI/UX Engineer",
+      "role": "Build Compose Multiplatform Material 3 responsive UI.",
+      "type": "specialist",
+      "criticality": "high",
+      "approval_authority": false,
+      "skills": [
+        "compose-adaptive-ui",
+        "route-photo-note-modeling"
+      ],
+      "protocols": [
+        "20-execution",
+        "30-surgical-edit"
+      ]
+    },
+    {
+      "canonical_id": "local-data-engineer",
+      "display_name": "Local Data & Persistence Engineer",
+      "role": "Design and maintain Room KMP entities, DAOs, and relations.",
+      "type": "specialist",
+      "criticality": "critical",
+      "approval_authority": false,
+      "skills": [
+        "room-kmp-persistence",
+        "room-kmp-migrations",
+        "offline-first-local-storage"
+      ],
+      "protocols": [
+        "20-execution",
+        "30-surgical-edit"
+      ]
+    },
+    {
+      "canonical_id": "revenuecat-monetization-engineer",
+      "display_name": "RevenueCat Monetization Engineer",
+      "role": "Integrate RevenueCat SDK and entitlement checking model.",
+      "type": "specialist",
+      "criticality": "high",
+      "approval_authority": false,
+      "skills": [
+        "revenuecat-hard-paywall"
+      ],
+      "protocols": [
+        "20-execution",
+        "30-surgical-edit"
+      ]
+    },
+    {
+      "canonical_id": "qa-automation-engineer",
+      "display_name": "QA Automation Engineer",
+      "role": "Author kotlin.test unit and integration test suites.",
+      "type": "specialist",
+      "criticality": "high",
+      "approval_authority": false,
+      "skills": [
+        "mobile-testing"
+      ],
+      "protocols": [
+        "20-execution",
+        "40-rca",
+        "50-verification"
+      ]
+    },
+    {
+      "canonical_id": "mobile-security-privacy-engineer",
+      "display_name": "Mobile Security & Privacy Engineer",
+      "role": "Enforce local data privacy and zero-tracking baseline.",
+      "type": "specialist",
+      "criticality": "critical",
+      "approval_authority": false,
+      "skills": [
+        "mobile-privacy-local-first"
+      ],
+      "protocols": [
+        "10-planning",
+        "30-surgical-edit",
+        "50-verification"
+      ]
+    },
+    {
+      "canonical_id": "mobile-devops-engineer",
+      "display_name": "Mobile DevOps & Build Engineer",
+      "role": "Maintain Gradle build scripts and libs.versions.toml version catalog.",
+      "type": "specialist",
+      "criticality": "medium",
+      "approval_authority": false,
+      "skills": [
+        "mobile-ci-cd"
+      ],
+      "protocols": [
+        "20-execution",
+        "30-surgical-edit"
+      ]
+    },
+    {
+      "canonical_id": "walkmark-documentation-engineer",
+      "display_name": "WalkMark Documentation Engineer",
+      "role": "Maintain technical documentation continuously under docs/architecture and docs/developer.",
+      "type": "specialist",
+      "criticality": "medium",
+      "approval_authority": false,
+      "skills": [
+        "documentation-and-user-manual"
+      ],
+      "protocols": [
+        "20-execution",
+        "30-surgical-edit",
+        "50-verification"
+      ]
+    },
+    {
+      "canonical_id": "qa-reviewer",
+      "display_name": "QA Reviewer & Quality Gate",
+      "role": "Perform independent final review of implementations and tests.",
+      "type": "reviewer",
+      "criticality": "critical",
+      "approval_authority": true,
+      "skills": [
+        "mobile-testing",
+        "documentation-and-user-manual"
+      ],
+      "protocols": [
+        "50-verification",
+        "60-skill-lifecycle"
+      ]
+    }
+  ]
+}

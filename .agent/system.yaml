@@ -1,0 +1,26 @@
+schema_version: 1
+system:
+  version: 1.0.0
+governance:
+  source: AGENTS.md
+project_map:
+  source: PROJECT_MAP.md
+agents:
+  source: .agent/registries/agents.yaml
+protocols:
+  source: .agent/protocols
+  required_order:
+  - 00-request-normalization
+  - 10-planning
+  - 20-execution
+  - 30-surgical-edit
+  - 40-rca
+  - 50-verification
+  - 60-skill-lifecycle
+skills:
+  source: skills/index.yaml
+target_application:
+  repository_path: ../Ledger-hub-mobile
+  write_policy: forbidden
+policy:
+  black_box_target: true
