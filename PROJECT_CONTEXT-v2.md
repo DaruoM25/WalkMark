@@ -28,5 +28,6 @@ WalkMark is a privacy-first, local-first GPS walk journaling mobile application 
 ## Verification Status
 - **N1**: Domain model creation, serialization round-trip, and architecture boundary tests - [VERIFIED]
 - **N2**: Room in-memory database CRUD, Compose UI rendering, semantic assertions, adaptive layout - [VERIFIED]
-- **N3a**: Android compilation, unit tests, and assembleDebug APK - [VERIFIED]
-- **N3b**: iOS simulator compilation and framework link verified via macOS CI workflow (`.github/workflows/ci.yml`) - [VERIFIED]
+- **N3a**: Android real device / emulator execution - [PLANNED]
+- **N3b**: iOS simulator compilation and framework link verified via macOS CI workflow (`.github/workflows/ci.yml`) - [PLANNED]
+
