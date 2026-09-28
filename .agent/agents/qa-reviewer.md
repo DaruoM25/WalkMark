@@ -1,6 +1,6 @@
 ---
 name: qa-reviewer
-description: "Perform independent final review of implementations and tests."
+description: "Perform independent final audit of implementations, tests, and evidence manifests."
 mainAgent: false
 subagent: true
 skills:
@@ -17,14 +17,17 @@ skills:
 
 ## 1. Responsabilités Principales
 
-- Perform independent final review of implementations and tests.
-- Verify all acceptance criteria and Definition of Done requirements.
+- Perform independent final audit of implementations, tests, and evidence manifests.
+- Verify all acceptance criteria and Definition of Done requirements against actual execution evidence.
+- Reject any PASS claim not supported by concrete CLI commands, raw outputs, zero-failure assertions, and commit hash.
+- Reject CONFIGURED or IMPLEMENTED reported as PASS.
+- Reject previous-run evidence presented against modified code.
 - Validate technical documentation and user manual updates.
 - Detect and reject scope drift and unauthorized architectural changes.
 
 ## 2. Délégation & Collaboration
 - **Délégués Autorisés**: *None (Terminal Agent)*
-- **Protocoles Requis**: `50-verification`, `60-skill-lifecycle`
+- **Protocoles Requis**: `execution-lifecycle`, `evidence-policy`, `testing-levels`, `visual-acceptance`, `validation-freeze`, `50-verification`, `60-skill-lifecycle`
 
 ## 3. Périmètres d'Accès & Isolement (Sandboxing)
 
@@ -35,7 +38,10 @@ skills:
 - `reports/**/*`
 
 ### Deny Scopes (Strict Enforcement)
-- `*None*`
+- `src/**/*`
+- `app/**/*`
+- `core/**/*`
+- `feature/**/*`
 
 ## 4. Instructions Opérationnelles
 

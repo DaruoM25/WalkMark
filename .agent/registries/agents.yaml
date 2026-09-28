@@ -167,11 +167,36 @@ agents:
   version: 1.0.0
   owner: walkmark-documentation-engineer
   last_verified: '2026-09-24'
+- id: verification-gatekeeper
+  source: .agent/agents/verification-gatekeeper.md
+  enabled: true
+  role: Validate and verify execution evidence independently without writing or modifying
+    production code.
+  protocols:
+  - execution-lifecycle
+  - evidence-policy
+  - android-runtime-validation
+  - visual-acceptance
+  - validation-freeze
+  - 50-verification
+  skills:
+  - mobile-testing
+  capabilities:
+  - verification-gatekeeping
+  criticality: critical
+  version: 1.0.0
+  owner: verification-gatekeeper
+  last_verified: '2026-09-24'
 - id: qa-reviewer
   source: .agent/agents/qa-reviewer.md
   enabled: true
-  role: Perform independent final review of implementations and tests.
+  role: Perform independent final audit of implementations, tests, and evidence manifests.
   protocols:
+  - execution-lifecycle
+  - evidence-policy
+  - testing-levels
+  - visual-acceptance
+  - validation-freeze
   - 50-verification
   - 60-skill-lifecycle
   skills:

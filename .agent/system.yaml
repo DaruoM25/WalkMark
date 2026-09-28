@@ -10,6 +10,14 @@ agents:
 protocols:
   source: .agent/protocols
   required_order:
+  - execution-lifecycle
+  - evidence-policy
+  - retry-and-rca
+  - testing-levels
+  - android-runtime-validation
+  - visual-acceptance
+  - git-isolation
+  - validation-freeze
   - 00-request-normalization
   - 10-planning
   - 20-execution

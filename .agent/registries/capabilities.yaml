@@ -39,6 +39,9 @@ capabilities:
   documentation-authoring:
     owner: walkmark-documentation-engineer
     skill: documentation-and-user-manual
+  verification-gatekeeping:
+    owner: verification-gatekeeper
+    skill: null
   quality-gate:
     owner: qa-reviewer
     skill: null

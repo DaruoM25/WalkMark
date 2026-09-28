@@ -22,6 +22,7 @@ WalkMark - Private local-first GPS walk journaling mobile application with photo
 | `mobile-security-privacy-engineer` | **Mobile Security & Privacy Engineer** | `specialist` | `antigravity` | `critical` | `No` |
 | `mobile-devops-engineer` | **Mobile DevOps & Build Engineer** | `specialist` | `antigravity` | `medium` | `No` |
 | `walkmark-documentation-engineer` | **WalkMark Documentation Engineer** | `specialist` | `antigravity` | `medium` | `No` |
+| `verification-gatekeeper` | **Verification Gatekeeper** | `reviewer` | `antigravity` | `critical` | `Yes` |
 | `qa-reviewer` | **QA Reviewer & Quality Gate** | `reviewer` | `antigravity` | `critical` | `Yes` |
 
 ## Detailed Responsibilities & Scopes
@@ -237,6 +238,30 @@ WalkMark - Private local-first GPS walk journaling mobile application with photo
 - **Write Scopes**: `docs/**/*`, `README.md`
 - **Deny Scopes**: *None*
 
+### Agent: `verification-gatekeeper` (Verification Gatekeeper)
+
+- **Type**: `reviewer`
+- **Runtime**: `antigravity`
+- **Criticality**: `critical`
+- **Approval Authority**: `YES`
+- **Delegates To**: *None*
+- **Required Protocols**: `execution-lifecycle`, `evidence-policy`, `android-runtime-validation`, `visual-acceptance`, `validation-freeze`, `50-verification`
+- **Required Skills**: `mobile-testing`
+
+#### Responsibilities:
+- Validate and verify execution evidence independently without writing or modifying production code.
+- Audit artifacts/<US>/evidence.yaml manifest for exact command execution, outputs, and current commit hash matches.
+- Enforce status model integrity (CONFIGURED != EXECUTED != PASS, IMPLEMENTED != VERIFIED).
+- Verify Android runtime facts (ADB daemon, lease, serial, AVD identity, visible vs headless state, foreground app).
+- Enforce Visual Acceptance checklist on visible emulator (separate SCREENSHOT_CAPTURE from VISUAL_ACCEPTANCE).
+- Protect FROZEN_PASS validation gates from unnecessary re-execution.
+- Deliver strict ACCEPT or REJECT verdicts with detailed reasons.
+
+#### Scope Boundaries:
+- **Read Scopes**: `**/*`
+- **Write Scopes**: `artifacts/**/evidence.yaml`, `reports/verification/**/*`
+- **Deny Scopes**: `src/**/*`, `app/**/*`, `core/**/*`, `feature/**/*`, `build.gradle.kts`, `settings.gradle.kts`, `gradle/**/*`
+
 ### Agent: `qa-reviewer` (QA Reviewer & Quality Gate)
 
 - **Type**: `reviewer`
@@ -244,30 +269,33 @@ WalkMark - Private local-first GPS walk journaling mobile application with photo
 - **Criticality**: `critical`
 - **Approval Authority**: `YES`
 - **Delegates To**: *None*
-- **Required Protocols**: `50-verification`, `60-skill-lifecycle`
+- **Required Protocols**: `execution-lifecycle`, `evidence-policy`, `testing-levels`, `visual-acceptance`, `validation-freeze`, `50-verification`, `60-skill-lifecycle`
 - **Required Skills**: `mobile-testing`, `documentation-and-user-manual`
 
 #### Responsibilities:
-- Perform independent final review of implementations and tests.
-- Verify all acceptance criteria and Definition of Done requirements.
+- Perform independent final audit of implementations, tests, and evidence manifests.
+- Verify all acceptance criteria and Definition of Done requirements against actual execution evidence.
+- Reject any PASS claim not supported by concrete CLI commands, raw outputs, zero-failure assertions, and commit hash.
+- Reject CONFIGURED or IMPLEMENTED reported as PASS.
+- Reject previous-run evidence presented against modified code.
 - Validate technical documentation and user manual updates.
 - Detect and reject scope drift and unauthorized architectural changes.
 
 #### Scope Boundaries:
 - **Read Scopes**: `**/*`
 - **Write Scopes**: `reports/**/*`
-- **Deny Scopes**: *None*
+- **Deny Scopes**: `src/**/*`, `app/**/*`, `core/**/*`, `feature/**/*`
 
 ## Workflows
 
 ### Workflow: `two-pass-feature-development`
 
-Mandatory 2-pass workflow. Pass 1 is investigation and planning only with a hard human approval gate. Pass 2 is verified implementation, testing, and QA review.
+Mandatory 2-pass workflow. Pass 1 is investigation and planning only with a hard human approval gate. Pass 2 is verified implementation, testing, evidence collection, verification gatekeeping, and QA review.
 
 | Stage | Agents | Mode | Human Gate | Review Gate | RCA Path |
 |---|---|---|---|---|---|
 | **pass-1-investigation-and-planning** | `walkmark-po-orchestrator`, `kmp-architecture-engineer`, `map-location-engineer`, `compose-ui-ux-engineer`, `local-data-engineer`, `revenuecat-monetization-engineer`, `mobile-security-privacy-engineer`, `mobile-devops-engineer`, `walkmark-documentation-engineer` | `sequential` | `Required` | `No` | `N/A` |
-| **pass-2-implementation-and-verification** | `kmp-architecture-engineer`, `map-location-engineer`, `compose-ui-ux-engineer`, `local-data-engineer`, `revenuecat-monetization-engineer`, `qa-automation-engineer`, `walkmark-documentation-engineer`, `qa-reviewer` | `sequential` | `No` | `Required` | `N/A` |
+| **pass-2-implementation-and-verification** | `kmp-architecture-engineer`, `map-location-engineer`, `compose-ui-ux-engineer`, `local-data-engineer`, `revenuecat-monetization-engineer`, `qa-automation-engineer`, `walkmark-documentation-engineer`, `verification-gatekeeper`, `qa-reviewer` | `sequential` | `No` | `Required` | `N/A` |
 
 ## Runtime & Container Enforcement Policies
 
@@ -276,4 +304,16 @@ Mandatory 2-pass workflow. Pass 1 is investigation and planning only with a hard
 - **Independent Clones**: `Enforced`
 - **Docker Socket Inside Containers**: `PROHIBITED (Security enforced)`
 - **Run as Non-Root**: `YES`
+
+## Non-Negotiable Governance & Execution Directives
+
+1. **Execution Lifecycle**: `OBSERVE` -> `ANALYZE` -> `PLAN` (Pass 1) -> `HUMAN APPROVAL` -> `PRE-FLIGHT` -> `IMPLEMENT` -> `VERIFY` -> `COLLECT EVIDENCE` -> `REVIEW` -> `PR READY`.
+2. **No Mutating Action Before Human Approval**: Pass 1 investigation must stop for explicit human approval before any production or configuration modification.
+3. **Evidence Over Assertion**: Every `PASS` verdict requires exact CLI command, output, zero-failure assertion, and current commit hash (`CLAIM` -> `COMMAND` -> `OUTPUT` -> `ASSERTION`). Unsupported claims default to `UNVERIFIED`.
+4. **Strict Status Taxonomy**: Allowed statuses are `NOT_STARTED`, `PLANNED`, `IMPLEMENTED`, `EXECUTING`, `PASS`, `FAIL`, `ENVIRONMENT_BLOCKED`, `ENVIRONMENT_INCOMPATIBLE`, `NOT_APPLICABLE`, `UNVERIFIED`, `FROZEN_PASS`. `CONFIGURED != EXECUTED != PASS`; `IMPLEMENTED != VERIFIED`; `COMPILED != runtime verified`.
+5. **Retry & Remediation Budget**: Max 2 identical retries; max 3 remediation attempts per root cause. If unsolved, STOP immediately and escalate to human decision.
+6. **Android Runtime Truth & Visual Acceptance**: Treat ADB daemon, lease, device presence, AVD identity, visible vs headless emulator, and app foreground as independent facts. Visible emulator is mandatory for UI acceptance. `SCREENSHOT_CAPTURE == PASS` does not equal `VISUAL_ACCEPTANCE == PASS`.
+7. **Test Preservation**: Existing tests must never be deleted, disabled, skipped, or weakened solely to obtain a green build.
+8. **Validation Freeze**: Gates marked `FROZEN_PASS` must not be reopened unless relevant source code or environment changes, or regression evidence exists.
+9. **Host / Container Isolation**: Host environment is restricted to Docker control, ADB, emulator host, and artifact transport. Source modification must stay strictly within isolated container workspace.
 
