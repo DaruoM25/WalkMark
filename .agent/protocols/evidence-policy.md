@@ -3,6 +3,17 @@
 ## Objective
 Ensure all verdicts are grounded in verifiable execution evidence.
 
+## Current-Evidence-First Evaluation Rule
+Before executing a verification gate:
+1. Verify canonical workspace, current branch, and current commit.
+2. Inspect `artifacts/<US>/evidence.yaml` and relevant artifacts/logs.
+3. Check if gate evidence matches current commit and is valid.
+4. If valid: Declare `SKIP_EXECUTION` and transition to `FROZEN_PASS`.
+5. If missing or invalid: Proceed with bounded execution.
+
+## Current State Overrides Historical Summary
+A retrospective or old execution log may NEVER downgrade a currently proven `PASS` to `UNVERIFIED` without explicit evidence of invalidation. Current valid evidence takes precedence.
+
 ## Evidence Pattern
 Every `PASS` must strictly follow:
 `CLAIM` -> `COMMAND` -> `OUTPUT` -> `ASSERTION`
@@ -14,35 +25,3 @@ Allowed statuses:
 - `IMPLEMENTED != VERIFIED`
 - `COMPILED != runtime verified`
 - Unknown or incomplete evidence must be reported as `UNVERIFIED`.
-
-## Canonical Evidence Manifest
-All per-US evidence must be recorded in `artifacts/<US>/evidence.yaml`:
-```yaml
-us: US-XXX
-commit: <sha>
-branch: agents/<runtime>/US-XXX
-runtime: antigravity
-n1:
-  status: PASS|FAIL|UNVERIFIED
-  evidence: <command + output>
-n2:
-  status: PASS|FAIL|UNVERIFIED
-  evidence: <command + output>
-n3a:
-  emulator:
-    avd: <avd_name>
-    serial: <device_serial>
-    visible: true|false
-  instrumentation:
-    status: PASS|FAIL|UNVERIFIED
-    tests: <count>
-    failures: 0
-  visual:
-    status: PASS|FAIL|UNVERIFIED
-    screenshot: artifacts/<US>/screenshot.png
-n3b:
-  status: PASS|FAIL|UNVERIFIED
-  ci_run: <url_or_id>
-review:
-  status: PASS|FAIL|UNVERIFIED
-```

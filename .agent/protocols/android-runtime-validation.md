@@ -1,4 +1,4 @@
-# Android Runtime Truth Protocol
+# Android Runtime Truth & Deterministic Recovery Protocol
 
 ## Independent Facts Model
 The following are independent facts and must NEVER be inferred from one another:
@@ -13,13 +13,21 @@ The following are independent facts and must NEVER be inferred from one another:
 9. `APP_FOREGROUND` (`dumpsys window | grep mCurrentFocus` matches package)
 10. `UI_HEALTHY` (no ANR or crash dialogs)
 
-## Step Sequence for N3a Validation
-1. Acquire ADB lease.
-2. Check ADB daemon and list devices.
-3. Query AVD name: `adb -s <serial> emu avd name`.
-4. If UI visual acceptance is required, enforce `VISIBLE_EMULATOR_RUNNING == true`.
-5. Wait for `sys.boot_completed == 1`.
-6. Explicitly start target activity (never rely on monkey for UI acceptance).
+## Deterministic Recovery Sequence
+1. Inspect state once (`adb devices`).
+2. Acquire ADB lease.
+3. Discover serial and verify AVD name.
+4. If absent, launch visible AVD once (visible emulator mandatory for UI acceptance).
+5. Wait maximum 120 seconds for `sys.boot_completed == 1`.
+6. Explicitly start target activity.
 7. Verify foreground window.
-8. Run instrumentation / connected checks.
+8. Execute requested Android gate.
 9. Release ADB lease.
+
+## Forbidden Actions During Android Validation
+- Monkey / random screen taps
+- Repeated keyevents / input loops
+- Launcher force-stop
+- Arbitrary ADB reconnect loops
+- Runtime SDK / path mutations
+If deterministic recovery fails: `ANDROID_GATE = ENVIRONMENT_BLOCKED`.

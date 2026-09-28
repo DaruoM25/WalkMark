@@ -24,3 +24,14 @@ Before initiating Pass 2 mutations, verify:
 - `AVD_AVAILABLE` = PASS
 - `CI_AVAILABLE` = PASS
 If any check fails, do NOT proceed with implementation.
+
+## Verify & Review Stage Read-Only Enforcement
+During `VERIFY` and `REVIEW` stages, writes to the following paths are strictly FORBIDDEN:
+- `composeApp/**`
+- `iosApp/**`
+- `gradle/**`
+- `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`, `libs.versions.toml`
+- Application unit and instrumentation tests
+If a verification test fails due to a source code defect:
+`VERIFY = FAIL` -> Record RCA -> STOP execution -> Require new implementation plan and human approval.
+Never loop between editing source and retrying during verification. Evidence and artifact writes remain permitted under `artifacts/**`.

@@ -309,11 +309,12 @@ Mandatory 2-pass workflow. Pass 1 is investigation and planning only with a hard
 
 1. **Execution Lifecycle**: `OBSERVE` -> `ANALYZE` -> `PLAN` (Pass 1) -> `HUMAN APPROVAL` -> `PRE-FLIGHT` -> `IMPLEMENT` -> `VERIFY` -> `COLLECT EVIDENCE` -> `REVIEW` -> `PR READY`.
 2. **No Mutating Action Before Human Approval**: Pass 1 investigation must stop for explicit human approval before any production or configuration modification.
-3. **Evidence Over Assertion**: Every `PASS` verdict requires exact CLI command, output, zero-failure assertion, and current commit hash (`CLAIM` -> `COMMAND` -> `OUTPUT` -> `ASSERTION`). Unsupported claims default to `UNVERIFIED`.
-4. **Strict Status Taxonomy**: Allowed statuses are `NOT_STARTED`, `PLANNED`, `IMPLEMENTED`, `EXECUTING`, `PASS`, `FAIL`, `ENVIRONMENT_BLOCKED`, `ENVIRONMENT_INCOMPATIBLE`, `NOT_APPLICABLE`, `UNVERIFIED`, `FROZEN_PASS`. `CONFIGURED != EXECUTED != PASS`; `IMPLEMENTED != VERIFIED`; `COMPILED != runtime verified`.
-5. **Retry & Remediation Budget**: Max 2 identical retries; max 3 remediation attempts per root cause. If unsolved, STOP immediately and escalate to human decision.
-6. **Android Runtime Truth & Visual Acceptance**: Treat ADB daemon, lease, device presence, AVD identity, visible vs headless emulator, and app foreground as independent facts. Visible emulator is mandatory for UI acceptance. `SCREENSHOT_CAPTURE == PASS` does not equal `VISUAL_ACCEPTANCE == PASS`.
-7. **Test Preservation**: Existing tests must never be deleted, disabled, skipped, or weakened solely to obtain a green build.
-8. **Validation Freeze**: Gates marked `FROZEN_PASS` must not be reopened unless relevant source code or environment changes, or regression evidence exists.
-9. **Host / Container Isolation**: Host environment is restricted to Docker control, ADB, emulator host, and artifact transport. Source modification must stay strictly within isolated container workspace.
+3. **Current-Evidence-First & State Override**: Before executing a gate, check current evidence. If valid, skip re-execution (`FROZEN_PASS`). Current proven state strictly overrides historical memory or old summaries.
+4. **Evidence Over Assertion**: Every `PASS` verdict requires exact CLI command, output, zero-failure assertion, and current commit hash (`CLAIM` -> `COMMAND` -> `OUTPUT` -> `ASSERTION`). Unsupported claims default to `UNVERIFIED`.
+5. **Strict Status Taxonomy**: Allowed statuses are `NOT_STARTED`, `PLANNED`, `IMPLEMENTED`, `EXECUTING`, `PASS`, `FAIL`, `ENVIRONMENT_BLOCKED`, `ENVIRONMENT_INCOMPATIBLE`, `NOT_APPLICABLE`, `UNVERIFIED`, `FROZEN_PASS`. `CONFIGURED != EXECUTED != PASS`; `IMPLEMENTED != VERIFIED`; `COMPILED != runtime verified`.
+6. **Per-Gate Execution Budget**: `MAX_COMMANDS_PER_GATE = 12`, `MAX_DURATION_PER_GATE_SECONDS = 300`, `IDENTICAL_RETRY_MAX = 2`, `REMEDIATION_ATTEMPTS_MAX = 2`. On budget exhaustion, STOP gate immediately and request human decision.
+7. **Automatic Gate Freeze**: Once complete evidence is recorded, transition immediately to `FROZEN_PASS`. A frozen gate reopens only if relevant source changes, environment changes, or regression evidence exists.
+8. **Verify / Review Stage Read-Only Protection**: Mutations to application code/tests (`composeApp/**`, `iosApp/**`, `gradle/**`) are strictly forbidden during `VERIFY` and `REVIEW` stages. Source defects require `VERIFY = FAIL`, RCA, and a new implementation plan.
+9. **Android Deterministic Recovery**: 1 state check, 1 visible AVD launch, max 120s boot wait, explicit app start, foreground verification. No monkey, random taps, keyevent loops, or ad-hoc runtime mutations.
+10. **Host / Container Isolation**: Host environment is restricted to Docker control, ADB, emulator host, and artifact transport. Source modification must stay strictly within isolated container workspace.
 
