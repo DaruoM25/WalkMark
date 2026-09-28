@@ -1,46 +1,92 @@
 us: US-001
-commit: 1788ccbe7a86f1196eda38edb1e1627c8bf07af3
 branch: agents/antigravity/US-001-kmp-stack-foundation
 runtime: antigravity
 
 n1:
   status: UNVERIFIED
-  evidence: null
+  claim: 'JVM / KMP unit tests pass'
+  commit: null
+  environment: null
+  command: null
+  output: null
+  assertion: null
+  historical_context: 'Requires clean execution in isolated runtime container'
 
 n2:
   status: UNVERIFIED
-  evidence: null
+  claim: 'Compose UI component tests pass'
+  commit: null
+  environment: null
+  command: null
+  output: null
+  assertion: null
+  historical_context: 'Requires clean execution in isolated runtime container'
 
 n3a:
   adb_runtime:
-    status: FROZEN_PASS
-    avd: Pixel_5_API_35
-    daemon: RUNNING
-    lease: ACQUIRED_AND_RELEASED
-    boot_completed: 1
-    note: 'ADB bridge connectivity, daemon lifecycle and device ready verified in baseline'
+    status: UNVERIFIED
+    claim: 'ADB runtime connectivity, daemon lease, and device readiness'
+    commit: null
+    environment:
+      avd: Pixel_5_API_35
+      daemon: RUNNING
+      boot_completed: 1
+    command: null
+    output: null
+    assertion: null
+    historical_context: 'Daemon lease and device readiness were validated interactively in baseline, but exact raw CLI execution trace is not preserved in repository history.'
+
   room_instrumentation:
-    status: FROZEN_PASS
-    test_count: 1
-    failures: 0
-    result: 'OK (1 test)'
-    instrumentation_code: -1
-    note: 'Room KMP instrumentation CRUD operations verified in baseline'
-  emulator:
-    avd: Pixel_5_API_35
-    serial: UNVERIFIED
-    visible: UNVERIFIED
-  visual:
-    screenshot_capture: PASS
-    screenshot: artifacts/US-001/screenshots/us001-ready-screen.png
-    visual_acceptance: UNVERIFIED
-    reason: 'Visual inspection on visible non-headless emulator pending revalidation'
+    status: UNVERIFIED
+    claim: 'Android on-device Room KMP CRUD instrumentation test execution'
+    commit: c98d99c71b693246237c1543160a0f588c83e20e
+    environment:
+      avd: Pixel_5_API_35
+      runner: androidx.test.runner.AndroidJUnitRunner
+    command: null
+    output: null
+    assertion: null
+    historical_context: 'Test added in c98d99c (RealAndroidRoomDatabaseTest.kt); baseline result reported test_count=1, failures=0, result=OK (1 test), code=-1, but raw command output record is not preserved in repository history.'
+
+  screenshot_capture:
+    status: PASS
+    claim: 'Screenshot artifact captured with valid PNG binary integrity'
+    commit: 1788ccbe7a86f1196eda38edb1e1627c8bf07af3
+    environment:
+      avd: Pixel_5_API_35
+    command: 'python3 inspect_png.py'
+    output: 'PNG_SIGNATURE_VALID=True, DIMENSIONS=1080x2340, FILE_SIZE=49621'
+    assertion: 'PNG binary signature is valid, non-zero dimensions (1080x2340), file exists at artifacts/US-001/screenshots/us001-ready-screen.png'
+    artifact: artifacts/US-001/screenshots/us001-ready-screen.png
+
+  visual_acceptance:
+    status: UNVERIFIED
+    claim: 'UI visual acceptance verified on visible non-headless emulator'
+    commit: null
+    environment:
+      avd: Pixel_5_API_35
+      display_mode: visible
+    command: null
+    output: null
+    assertion: null
+    historical_context: 'Image artifact exists, but UI inspection on active visible emulator window and foreground verification must be performed during revalidation.'
 
 n3b:
   status: UNVERIFIED
-  ci_run: null
+  claim: 'CI pipeline execution on remote runner'
+  commit: null
+  environment: null
+  command: null
+  output: null
+  assertion: null
+  historical_context: 'Pending CI execution'
 
 review:
   status: UNVERIFIED
-  gatekeeper_verdict: UNVERIFIED
-  qa_reviewer_verdict: UNVERIFIED
+  claim: 'Independent verification gatekeeper and QA reviewer sign-off'
+  commit: null
+  environment: null
+  command: null
+  output: null
+  assertion: null
+  historical_context: 'Pending final revalidation evidence review'
