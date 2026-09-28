@@ -1,5 +1,5 @@
 us: US-001
-commit: unverified_prior_head
+commit: 1788ccbe7a86f1196eda38edb1e1627c8bf07af3
 branch: agents/antigravity/US-001-kmp-stack-foundation
 runtime: antigravity
 
@@ -14,23 +14,27 @@ n2:
 n3a:
   adb_runtime:
     status: FROZEN_PASS
-    note: 'ADB bridge connectivity and daemon lease verified in prior validation'
-  room_migrations:
+    avd: Pixel_5_API_35
+    daemon: RUNNING
+    lease: ACQUIRED_AND_RELEASED
+    boot_completed: 1
+    note: 'ADB bridge connectivity, daemon lifecycle and device ready verified in baseline'
+  room_instrumentation:
     status: FROZEN_PASS
-    note: 'Room KMP migrations verified in prior validation'
+    test_count: 1
+    failures: 0
+    result: 'OK (1 test)'
+    instrumentation_code: -1
+    note: 'Room KMP instrumentation CRUD operations verified in baseline'
   emulator:
-    avd: walkmark_pixel_api34
+    avd: Pixel_5_API_35
     serial: UNVERIFIED
     visible: UNVERIFIED
-  instrumentation:
-    status: UNVERIFIED
-    tests: 0
-    failures: 0
   visual:
     screenshot_capture: PASS
     screenshot: artifacts/US-001/screenshots/us001-ready-screen.png
     visual_acceptance: UNVERIFIED
-    reason: 'Visual inspection against non-headless emulator and foreground status pending revalidation'
+    reason: 'Visual inspection on visible non-headless emulator pending revalidation'
 
 n3b:
   status: UNVERIFIED
