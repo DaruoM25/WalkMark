@@ -2,7 +2,7 @@
 
 All notable changes to WalkMark will be documented in this file.
 
-## [Unreleased]
+# [Unreleased]
 ### Added - [ACCEPTED_WITH_RUNTIME_WAIVER]
 - **US-003A: Local Walk Persistence, Notes, and Photos**:
   - Room KMP database at schema version 2 with five entities: `Walk`, accepted GPS `WalkPoint`,
@@ -45,7 +45,19 @@ All notable changes to WalkMark will be documented in this file.
   Docs: `docs/architecture/persistence.md`, `docs/evidence/us-003a/README.md`.
 
 ### Added - [VERIFIED]
-
+=======
+## [Unreleased]
+### Added - [VERIFIED]
+- **US-004A: Adaptive / Responsive Layout Foundation**:
+  - Presentation width classification (`AdaptiveWidthClass.Compact` < 600dp, `AdaptiveWidthClass.Medium` 600dp..839dp, `AdaptiveWidthClass.Expanded` >= 840dp).
+  - `AdaptiveWalkScaffold` supporting `CompactSinglePane`, `MediumSinglePane`, `ExpandedTwoPane` (~70/30 distribution with minimum constraints), and `CompactFlex` layout modes.
+  - Platform posture abstraction (`DevicePosture.Normal`, `DevicePosture.TableTop`, `DevicePosture.Book`, `DevicePosture.SeparatingHinge`) with production posture defaulting to Normal.
+  - Content slots decoupling presentation shell from future MapLibre renderer and current tracking/journal components.
+  - State continuity verified across layout transitions during active GPS recording sessions.
+  - Flex-compatible adaptive layout implemented; real fold posture detection deferred.
+  - Automated tests: unit (`AdaptiveLayoutTest`), state continuity (`AdaptiveStateContinuityTest`), and Compose Robolectric UI (`AdaptiveScaffoldComposeTest`).
+  - Runtime validation PASS on Android emulator (Compact layout, Expanded TwoPane layout, rotation continuity, and active tracking preservation).
+  - 
 - **US-002: Walk Recording Core + Native Background GPS Engine**:
   - Common domain models and repository: `LocationPoint`, `LocationTrackingState`, and `LocationRepository` interface.
   - `DistanceEngine` implementing Haversine geodesic calculation.

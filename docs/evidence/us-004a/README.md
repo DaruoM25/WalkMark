@@ -21,4 +21,3 @@ Visual runtime evidence for US-004A adaptive layout and state continuity.
 - **Rotation runtime**: `PASS`
 - **Medium runtime**: `ENVIRONMENT_BLOCKED` (dedicated 600-839dp display profile unavailable)
 - **Real Fold / Flip posture detection**: `DEFERRED` / `ENVIRONMENT_BLOCKED` (Flex-compatible adaptive layout implemented; real fold posture detection deferred)
-
