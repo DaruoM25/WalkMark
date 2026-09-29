@@ -6,3 +6,6 @@ build/
 local.properties
 .kotlin/
 schemas/
+# Room schema export must be committed (US-003A): re-include the app's exported Room schemas.
+!composeApp/schemas/
+!composeApp/schemas/**

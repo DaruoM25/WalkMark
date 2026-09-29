@@ -5,6 +5,13 @@
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.androidxRoom)
+}
+
+room {
+    // Relative path: an absolute path would embed the workspace path (which contains a
+    // space) into a KSP processor argument, and KSP rejects values with spaces.
+    schemaDirectory("schemas")
 }
 
 kotlin {
@@ -57,6 +64,13 @@ kotlin {
             implementation(libs.robolectric)
             implementation(libs.androidx.test.core)
             implementation(libs.androidx.test.junit)
+            implementation(libs.androidx.sqlite.framework)
+        }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.kotlin.test.junit)
+            implementation(libs.androidx.test.core)
+            implementation(libs.androidx.test.junit)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }
