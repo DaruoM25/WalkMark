@@ -15,5 +15,6 @@ fun createRoomDatabase(
     return builder
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(dispatcher)
+        .addMigrations(WalkMarkMigrations.MIGRATION_1_2)
         .build()
 }
