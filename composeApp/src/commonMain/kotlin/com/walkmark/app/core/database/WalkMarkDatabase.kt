@@ -16,11 +16,15 @@ import com.walkmark.app.core.database.entity.WalkPhotoEntity
 import com.walkmark.app.core.database.entity.WalkPointEntity
 
 /**
- * Room schema JSON is exported to `composeApp/schemas` via the `androidx.room` Gradle plugin
- * (`room { schemaDirectory("schemas") }`) and committed to the repository. The exported schemas
- * are the source of truth for schema-version history; `WalkMigration_1_2_Test` additionally
- * executes MIGRATION_1_2 against a real SQLite connection to prove data-preservation and
- * FK/CASCADE behavior.
+ * `exportSchema = true` is the intended end state, but schema JSON export is currently
+ * ENVIRONMENT_BLOCKED: the `androidx.room` Gradle plugin fails here because KSP rejects a schema
+ * path containing a space in the workspace path, and no validated export mechanism was found.
+ * Consequently `composeApp/schemas` is empty and no schema history is committed.
+ *
+ * The authoritative evidence for this schema version is therefore behavioral:
+ * `WalkMigration_1_2_Test` executes MIGRATION_1_2 against a real SQLite connection and asserts the
+ * resulting columns match current entity expectations, and `WalkPersistenceIntegrationTest` proves
+ * FK/CASCADE and close-reopen durability. See docs/evidence/us-003a/README.md.
  */
 @Database(
     entities = [

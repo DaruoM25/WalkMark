@@ -5,13 +5,6 @@
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.androidxRoom)
-}
-
-room {
-    // Relative path: an absolute path would embed the workspace path (which contains a
-    // space) into a KSP processor argument, and KSP rejects values with spaces.
-    schemaDirectory("schemas")
 }
 
 kotlin {
@@ -70,6 +63,7 @@ kotlin {
             implementation(libs.kotlin.test.junit)
             implementation(libs.androidx.test.core)
             implementation(libs.androidx.test.junit)
+            implementation(libs.androidx.test.runner)
             implementation(libs.kotlinx.coroutines.test)
         }
     }
@@ -85,6 +79,10 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+        // Without this, AGP falls back to the deprecated framework runner
+        // android.test.InstrumentationTestRunner, which drives a JUnit 3 junit.framework.TestSuite
+        // and therefore reports "No tests found" for a JUnit 4 @RunWith(AndroidJUnit4::class) test.
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
