@@ -53,7 +53,7 @@ class AppSupportNavigationTest {
     }
 
     @Test
-    fun supportDestinationReturnsToPreservedTrackingState() {
+    fun settingsAndSupportDestinationReturnsToPreservedTrackingState() {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalInspectionMode provides true) {
                 PreviewContextConfigurationEffect()
@@ -67,9 +67,13 @@ class AppSupportNavigationTest {
         }
 
         composeTestRule.onNodeWithTag("stop_walk_button").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("support_entry_button").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("settings_entry_button").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("settings_screen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("settings_support_button").assertIsDisplayed().performClick()
         composeTestRule.onNodeWithTag("support_screen").assertIsDisplayed()
         composeTestRule.onNodeWithTag("support_back_button").performClick()
+        composeTestRule.onNodeWithTag("settings_screen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("settings_back_button").performClick()
         composeTestRule.onNodeWithTag("stop_walk_button").assertIsDisplayed()
     }
 }

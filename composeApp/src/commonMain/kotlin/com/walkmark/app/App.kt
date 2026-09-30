@@ -1,4 +1,4 @@
-﻿package com.walkmark.app
+package com.walkmark.app
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -50,12 +50,15 @@ import com.walkmark.app.presentation.location.LocationViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
 import com.walkmark.app.presentation.paywall.HardPaywallSheet
 import com.walkmark.app.presentation.paywall.HardPaywallUiState
+import com.walkmark.app.presentation.settings.SettingsScreen
+import com.walkmark.app.presentation.settings.SettingsViewModel
 import com.walkmark.app.presentation.support.SupportContactConfig
 import com.walkmark.app.presentation.support.SupportScreen
 import com.walkmark.app.presentation.theme.WalkMarkTheme
 import com.walkmark.app.presentation.walk.WalkViewModel
 import org.jetbrains.compose.resources.stringResource
 import walkmark.composeapp.generated.resources.Res
+import walkmark.composeapp.generated.resources.settings_entry
 import walkmark.composeapp.generated.resources.support_entry
 
 val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
@@ -64,6 +67,7 @@ val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
 
 private enum class RootDestination {
     Main,
+    Settings,
     Support
 }
 
@@ -134,6 +138,13 @@ fun App(
                 )
             }
 
+            val settingsViewModel = remember(walks, scope) {
+                SettingsViewModel(
+                    walkRepository = walks,
+                    scope = scope
+                )
+            }
+
             val viewModel = remember(repository, startWalk) {
                 LocationViewModel(
                     locationRepository = repository,
@@ -168,20 +179,25 @@ fun App(
                             }
                         )
                         TextButton(
-                            onClick = { destination = RootDestination.Support },
+                            onClick = { destination = RootDestination.Settings },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .windowInsetsPadding(WindowInsets.safeDrawing)
                                 .padding(8.dp)
-                                .testTag("support_entry_button")
-                                .semantics { contentDescription = "Help and Support" }
+                                .testTag("settings_entry_button")
+                                .semantics { contentDescription = "Settings" }
                         ) {
-                            Text(stringResource(Res.string.support_entry))
+                            Text(stringResource(Res.string.settings_entry))
                         }
                     }
+                    RootDestination.Settings -> SettingsScreen(
+                        viewModel = settingsViewModel,
+                        onNavigateToSupport = { destination = RootDestination.Support },
+                        onBack = { destination = RootDestination.Main }
+                    )
                     RootDestination.Support -> SupportScreen(
                         contactConfig = supportContactConfig,
-                        onBack = { destination = RootDestination.Main }
+                        onBack = { destination = RootDestination.Settings }
                     )
                 }
             }
