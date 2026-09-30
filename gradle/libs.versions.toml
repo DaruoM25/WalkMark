@@ -16,6 +16,7 @@ androidx-sqlite = "2.5.0-alpha11"
 turbine = "1.1.0"
 robolectric = "4.13"
 play-services-location = "21.3.0"
+maplibre-android = "11.11.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -30,6 +31,7 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 # Google Play Services Location
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+maplibre-android = { module = "org.maplibre.gl:android-sdk", version.ref = "maplibre-android" }
 
 # Room KMP
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

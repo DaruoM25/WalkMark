@@ -29,6 +29,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.play.services.location)
+            implementation(libs.maplibre.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

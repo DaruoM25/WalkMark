@@ -48,6 +48,7 @@ import com.walkmark.app.presentation.adaptive.DevicePosture
 import com.walkmark.app.presentation.journal.JournalScreen
 import com.walkmark.app.presentation.location.LocationViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
+import com.walkmark.app.presentation.map.LiveMapUiState
 import com.walkmark.app.presentation.paywall.HardPaywallSheet
 import com.walkmark.app.presentation.paywall.HardPaywallUiState
 import com.walkmark.app.presentation.support.SupportContactConfig
@@ -74,7 +75,8 @@ fun App(
     mediaStore: LocalMediaStore? = null,
     supportContactConfig: SupportContactConfig = SupportContactConfig.NotConfigured,
     posture: DevicePosture = DevicePosture.Normal,
-    subscriptionManager: SubscriptionManager? = null
+    subscriptionManager: SubscriptionManager? = null,
+    mapContent: (@Composable (LiveMapUiState, Modifier) -> Unit)? = null
 ) {
     WalkMarkTheme {
         Surface(
@@ -161,7 +163,7 @@ fun App(
                         AdaptiveWalkScaffold(
                             posture = posture,
                             primaryContent = { _ ->
-                                TrackingScreen(viewModel = viewModel)
+                                TrackingScreen(viewModel = viewModel, mapContent = mapContent)
                             },
                             secondaryContent = { _ ->
                                 JournalScreen()
