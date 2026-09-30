@@ -1,10 +1,14 @@
 ﻿package com.walkmark.app.presentation.adaptive
 
 import androidx.compose.ui.unit.dp
+import com.walkmark.app.data.monetization.FakeSubscriptionManager
 import com.walkmark.app.domain.location.LocationPoint
 import com.walkmark.app.domain.location.LocationRepository
 import com.walkmark.app.domain.location.LocationTrackingState
+import com.walkmark.app.domain.monetization.SubscriptionState
+import com.walkmark.app.domain.walk.StartWalkUseCase
 import com.walkmark.app.presentation.location.LocationViewModel
+import com.walkmark.app.testing.StubPersistedWalkCount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,7 +77,15 @@ class AdaptiveStateContinuityTest {
     @Test
     fun testTrackingStateSurvivesLayoutModeTransitions() = runTest(testDispatcher) {
         val repository = FakeLocationRepository()
-        val viewModel = LocationViewModel(repository)
+        val viewModel = LocationViewModel(
+            locationRepository = repository,
+            startWalk = StartWalkUseCase(
+                subscriptionManager = FakeSubscriptionManager(SubscriptionState.free()),
+                walkCount = StubPersistedWalkCount(0),
+                locationRepository = repository,
+                scope = backgroundScope
+            )
+        )
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect()

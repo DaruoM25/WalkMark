@@ -1,8 +1,12 @@
 package com.walkmark.app.presentation.location
 
+import com.walkmark.app.data.monetization.FakeSubscriptionManager
 import com.walkmark.app.domain.location.LocationPoint
 import com.walkmark.app.domain.location.LocationRepository
 import com.walkmark.app.domain.location.LocationTrackingState
+import com.walkmark.app.domain.monetization.SubscriptionState
+import com.walkmark.app.domain.walk.StartWalkUseCase
+import com.walkmark.app.testing.StubPersistedWalkCount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -96,10 +101,24 @@ class LocationViewModelTest {
         }
     }
 
+    private fun TestScope.createViewModel(
+        repository: LocationRepository,
+        walkCount: Int = 0,
+        subscriptionState: SubscriptionState = SubscriptionState.free()
+    ): LocationViewModel = LocationViewModel(
+        locationRepository = repository,
+        startWalk = StartWalkUseCase(
+            subscriptionManager = FakeSubscriptionManager(subscriptionState),
+            walkCount = StubPersistedWalkCount(walkCount),
+            locationRepository = repository,
+            scope = backgroundScope
+        )
+    )
+
     @Test
     fun viewModel_initialState_isIdle() = runTest(testDispatcher) {
         val repository = FakeLocationRepository()
-        val viewModel = LocationViewModel(repository)
+        val viewModel = createViewModel(repository)
 
         assertEquals(LocationTrackingState.Idle, viewModel.uiState.value.state)
         assertEquals(0, viewModel.uiState.value.points.size)
@@ -111,7 +130,7 @@ class LocationViewModelTest {
     @Test
     fun viewModel_startTracking_updatesStateAndDelegatesOnce() = runTest(testDispatcher) {
         val repository = FakeLocationRepository()
-        val viewModel = LocationViewModel(repository)
+        val viewModel = createViewModel(repository)
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect()
@@ -128,7 +147,7 @@ class LocationViewModelTest {
     @Test
     fun viewModel_receivesAcceptedPoints_updatesDistanceAndPoints() = runTest(testDispatcher) {
         val repository = FakeLocationRepository()
-        val viewModel = LocationViewModel(repository)
+        val viewModel = createViewModel(repository)
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect()
@@ -156,7 +175,7 @@ class LocationViewModelTest {
     @Test
     fun viewModel_errorState_exposesErrorMessage() = runTest(testDispatcher) {
         val repository = FakeLocationRepository()
-        val viewModel = LocationViewModel(repository)
+        val viewModel = createViewModel(repository)
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect()
@@ -173,7 +192,7 @@ class LocationViewModelTest {
     @Test
     fun viewModel_actions_delegateCorrectly() = runTest(testDispatcher) {
         val repository = FakeLocationRepository()
-        val viewModel = LocationViewModel(repository)
+        val viewModel = createViewModel(repository)
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect()

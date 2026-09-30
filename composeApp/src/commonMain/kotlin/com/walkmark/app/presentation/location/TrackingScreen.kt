@@ -36,6 +36,7 @@ fun TrackingScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isStartingWalk by viewModel.isStartingWalk.collectAsState()
 
     val permissionLauncher = rememberLocationPermissionLauncher(
         onPermissionGranted = {
@@ -134,6 +135,7 @@ fun TrackingScreen(
             if (!isTracking) {
                 Button(
                     onClick = { permissionLauncher() },
+                    enabled = !isStartingWalk && !isTracking,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)

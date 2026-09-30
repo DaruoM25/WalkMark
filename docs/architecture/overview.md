@@ -12,4 +12,5 @@ WalkMark is a private, local-first GPS wank journaling mobile application built 
 - **Maps**: MapLibre Compose + OpenStreetMap  - [PLANNED]
 - **Location**: FusedLocationProviderClient + Foreground Service (Android) / CLLocationManager (iOS)  - [PLANNED]
 - **Networking**: Ktor Client + Kotlinx.serialization  - [PLANNED]
-- **Monetization**: RevenueCat SDK (3 free saved walks, hard paywall on 4th save: $2.99/week, $19.99/year)  - [PLANNED]
+- **Monetization**: 3 free saved walks + hard paywall on the 4th, enforced by a provider-neutral domain gate  - [IMPLEMENTED (PHASE 1: NO PURCHASE PROVIDER)]
+  - RevenueCat SDK and live billing: [PLANNED]. Planned pricing $2.99/week, $19.99/year. The runtime UI never displays these prices in Phase 1 because no provider supplies them.

@@ -9,5 +9,6 @@
 ## Future Feature Modularization - [PLANNED]
 - GPS & Background Location Tracking  - [PLANNED]
 - MapLibre Compose + OSM rendering  - [PLANNED]
-- RevenueCat Monetization & 4th-save paywall  - [PLANNED]
+- RevenueCat SDK & live billing  - [PLANNED]
+- 3-free-walk quota gate & hard paywall (provider-neutral, no purchase provider)  - [IMPLEMENTED]
 - Photo & Note Attachments  - [PLANNED]
