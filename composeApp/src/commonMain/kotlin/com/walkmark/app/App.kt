@@ -1,4 +1,4 @@
-﻿package com.walkmark.app
+package com.walkmark.app
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -46,20 +46,22 @@ import com.walkmark.app.domain.walk.StartWalkUseCase
 import com.walkmark.app.domain.walk.WalkStartResult
 import com.walkmark.app.presentation.adaptive.AdaptiveWalkScaffold
 import com.walkmark.app.presentation.adaptive.DevicePosture
-import com.walkmark.app.presentation.journal.JournalScreen
+import com.walkmark.app.presentation.journal.DeleteWalkResult
 import com.walkmark.app.presentation.journal.WalkDetailScreen
 import com.walkmark.app.presentation.journal.WalkHistoryScreen
-import com.walkmark.app.presentation.journal.deletionNotice
 import com.walkmark.app.presentation.location.LocationViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
 import com.walkmark.app.presentation.paywall.HardPaywallSheet
 import com.walkmark.app.presentation.paywall.HardPaywallUiState
+import com.walkmark.app.presentation.settings.SettingsScreen
+import com.walkmark.app.presentation.settings.SettingsViewModel
 import com.walkmark.app.presentation.support.SupportContactConfig
 import com.walkmark.app.presentation.support.SupportScreen
 import com.walkmark.app.presentation.theme.WalkMarkTheme
 import com.walkmark.app.presentation.walk.WalkViewModel
 import org.jetbrains.compose.resources.stringResource
 import walkmark.composeapp.generated.resources.Res
+import walkmark.composeapp.generated.resources.settings_entry
 import walkmark.composeapp.generated.resources.support_entry
 
 val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
@@ -68,9 +70,16 @@ val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
 
 private enum class RootDestination {
     Main,
+    Settings,
     Support,
     History,
     Detail
+}
+
+private fun deletionNotice(result: DeleteWalkResult): String = when (result) {
+    DeleteWalkResult.Deleted -> "Walk deleted"
+    DeleteWalkResult.DeletedWithMediaWarning -> "Walk deleted (some photos could not be removed)"
+    DeleteWalkResult.Failed -> "Failed to delete walk"
 }
 
 @Composable
@@ -98,10 +107,10 @@ fun App(
                 )
             }
 
-            val media = remember { mediaStore ?: createLocalMediaStore() }
-            val walks = remember(walkRepository, media) {
-                walkRepository ?: RoomWalkRepository(createRoomDatabase(getDatabaseBuilder()), media)
+            val walks = remember(walkRepository) {
+                walkRepository ?: RoomWalkRepository(createRoomDatabase(getDatabaseBuilder()))
             }
+            val media = remember { mediaStore ?: createLocalMediaStore() }
 
             val subscriptions = remember(subscriptionManager) {
                 subscriptionManager ?: UnavailableSubscriptionManager()
@@ -140,6 +149,13 @@ fun App(
                 )
             }
 
+            val settingsViewModel = remember(walks, scope) {
+                SettingsViewModel(
+                    walkRepository = walks,
+                    scope = scope
+                )
+            }
+
             val viewModel = remember(repository, startWalk) {
                 LocationViewModel(
                     locationRepository = repository,
@@ -152,6 +168,8 @@ fun App(
             val offerings by subscriptions.offerings.collectAsState()
 
             var paywallVisible by remember { mutableStateOf(false) }
+            var selectedWalkId by remember { mutableStateOf<String?>(null) }
+            var historyNotice by remember { mutableStateOf<String?>(null) }
 
             LaunchedEffect(startResult) {
                 if (startResult is WalkStartResult.RequiresSubscription) {
@@ -160,8 +178,6 @@ fun App(
                 }
             }
             var destination by remember { mutableStateOf(RootDestination.Main) }
-            var selectedWalkId by remember { mutableStateOf<String?>(null) }
-            var historyNotice by remember { mutableStateOf<String?>(null) }
 
             CompositionLocalProvider(LocalWalkViewModel provides walkViewModel) {
                 when (destination) {
@@ -187,17 +203,35 @@ fun App(
                             TextButton(
                                 onClick = { historyNotice = null; destination = RootDestination.History },
                                 modifier = Modifier.testTag("history_entry_button")
-                            ) { Text("History") }
+                            ) {
+                                Text("History")
+                            }
+                            TextButton(
+                                onClick = { destination = RootDestination.Settings },
+                                modifier = Modifier
+                                    .testTag("settings_entry_button")
+                                    .semantics { contentDescription = "Settings" }
+                            ) {
+                                Text(stringResource(Res.string.settings_entry))
+                            }
                             TextButton(
                                 onClick = { destination = RootDestination.Support },
-                                modifier = Modifier.testTag("support_entry_button")
+                                modifier = Modifier
+                                    .testTag("support_entry_button")
                                     .semantics { contentDescription = "Help and Support" }
-                            ) { Text(stringResource(Res.string.support_entry)) }
+                            ) {
+                                Text(stringResource(Res.string.support_entry))
+                            }
                         }
                     }
+                    RootDestination.Settings -> SettingsScreen(
+                        viewModel = settingsViewModel,
+                        onNavigateToSupport = { destination = RootDestination.Support },
+                        onBack = { destination = RootDestination.Main }
+                    )
                     RootDestination.Support -> SupportScreen(
                         contactConfig = supportContactConfig,
-                        onBack = { destination = RootDestination.Main }
+                        onBack = { destination = RootDestination.Settings }
                     )
                     RootDestination.History -> WalkHistoryScreen(
                         repository = walks,
@@ -233,4 +267,3 @@ fun App(
         }
     }
 }
-
