@@ -2,7 +2,9 @@
 
 ## AUTHORITATIVE_SOURCES
 
-- Governance: `AGENTS.md`
+- **Governance (canonical)**: `docs/developer/DEVELOPMENT_GOVERNANCE_V3.md`
+- **Story ownership**: `docs/developer/STORY_OWNERSHIP.yaml`
+- **High-conflict registry**: `docs/developer/HIGH_CONFLICT_FILES.yaml`
 - System registry: `.agent/system.yaml`
 - Agent registry: `.agent/registries/agents.yaml`
 - Skills: `skills/index.yaml` and each indexed source file

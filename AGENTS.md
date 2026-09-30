@@ -1,14 +1,70 @@
-# WalkMark - Agent Governance & System Roster
+# WalkMark — Agent Governance & System Roster
 
-> **Project Type**: mobile-kmp  
-> **Base Branch**: `main`  
-> **Repository**: `TODO / not_configured`
+> **Project Type**: mobile-kmp
+> **Base Branch**: `main`
+> **Repository**: `DaruoM25/WalkMark`
+> **Governance Version**: V3 (canonical: `docs/developer/DEVELOPMENT_GOVERNANCE_V3.md`)
+> **Status**: ACTIVE
 
-## Architecture Overview
+---
 
-WalkMark - Private local-first GPS walk journaling mobile application with photos, notes, and offline maps built on Kotlin Multiplatform, Compose Multiplatform, and Room KMP.
+## 1. Governance
 
-## Agent Roster
+### 1.1 Canonical Sources
+
+| Artifact | Location |
+|----------|---------|
+| **Governance (canonical)** | `docs/developer/DEVELOPMENT_GOVERNANCE_V3.md` |
+| **Story ownership** | `docs/developer/STORY_OWNERSHIP.yaml` |
+| **High-conflict registry** | `docs/developer/HIGH_CONFLICT_FILES.yaml` |
+| **PR template** | `.github/pull_request_template.md` |
+| **Agent roster** | This file (AGENTS.md) |
+| **Project map** | `PROJECT_MAP.md` |
+
+> Full lifecycle, PASS gates, loop guard, evidence model, test deletion guard, fake/provider policy, frozen pass, post-merge gate, migration rules are specified in **DEVELOPMENT_GOVERNANCE_V3.md**. This file contains only the entry rules.
+
+### 1.2 Lifecycle Summary
+
+```
+PASS0 — REPO HEALTH
+  ↓ (REPO_HEALTH = PASS)
+PASS1 — OBSERVE / ANALYZE / PLAN     [READ-ONLY]
+  ↓ (PLAN_APPROVED)
+HUMAN APPROVAL — PLAN
+  ↓
+PASS2 — PRE-FLIGHT
+  ↓ (PREFLIGHT_PASS)
+HUMAN APPROVAL — IMPLEMENTATION AUTHORIZED
+  ↓
+PASS3 — IMPLEMENT
+  ↓ (IMPLEMENTED)
+PASS4 — VERIFY
+  ↓ (VERIFIED)
+INDEPENDENT REVIEW
+  ↓ (REVIEW_PASS)
+PR READY
+  ↓
+HUMAN APPROVAL — MERGE
+  ↓
+MERGED → POST-MERGE MAIN GATE → MAIN_VERIFIED → FROZEN_PASS
+```
+
+### 1.3 Mandatory Rules (Condensed)
+
+1. **PASS0 is mandatory before every feature story.** Main compile baseline must be proven (`./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon`). If main is broken, feature work pauses; dedicated hotfix required.
+2. **PASS1 is strictly read-only.** No code mutation, no build output generation, no file writes. `./gradlew tasks` / `help` / `--dry-run` only.
+3. **No coding before human authorization.** PLAN_APPROVED + IMPLEMENTATION_AUTHORIZED required before Pass3.
+4. **Loop guard: MAX_ATTEMPTS = 2.** One objective, two attempts max. RCA required after each failure. Tool switching does NOT reset the counter. BLOCKED after 2 failed attempts — human decision required.
+5. **Workspace isolation.** Each story gets a fresh clone or dedicated Git worktree. Host is read-only for source. All writes in isolated container.
+6. **No external-regression masking.** If a story discovers a pre-existing main defect, the story pauses. Dedicated hotfix required. No story silently carries the fix.
+7. **Git/GitHub is the only normal inter-agent source transfer.** No agent assumes unpublished work from another agent.
+8. **Evidence requirement.** Every PASS requires CLAIM → COMMAND → OUTPUT → ASSERTION → COMMIT → ENVIRONMENT. Unsupported claims = UNVERIFIED.
+9. **Frozen pass.** A frozen/accepted story reopens ONLY for concrete regression, explicit integration requirement, or approved schema/API compatibility change. No opportunistic cleanup.
+10. **Test deletion guard.** Deleting, disabling, or weakening existing tests requires REMOVED_TEST / WHY_REMOVED / REPLACEMENT_TEST / EQUIVALENT_COVERAGE / HUMAN_APPROVAL.
+
+---
+
+## 2. Agent Roster
 
 | ID | Display Name | Type | Runtime | Criticality | Approval Authority |
 |---|---|---|---|---|---|
@@ -24,7 +80,7 @@ WalkMark - Private local-first GPS walk journaling mobile application with photo
 | `walkmark-documentation-engineer` | **WalkMark Documentation Engineer** | `specialist` | `antigravity` | `medium` | `No` |
 | `qa-reviewer` | **QA Reviewer & Quality Gate** | `reviewer` | `antigravity` | `critical` | `Yes` |
 
-## Detailed Responsibilities & Scopes
+## 3. Detailed Responsibilities & Scopes
 
 ### Agent: `walkmark-po-orchestrator` (WalkMark Product Owner & Orchestrator)
 
