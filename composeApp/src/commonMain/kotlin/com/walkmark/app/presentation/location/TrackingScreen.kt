@@ -2,6 +2,7 @@ package com.walkmark.app.presentation.location
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -29,14 +33,18 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.walkmark.app.domain.location.LocationTrackingState
+import com.walkmark.app.presentation.map.LiveMapUiState
+import com.walkmark.app.presentation.map.toLiveMapUiState
 
 @Composable
 fun TrackingScreen(
     viewModel: LocationViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    mapContent: (@Composable (LiveMapUiState, Modifier) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isStartingWalk by viewModel.isStartingWalk.collectAsState()
+    var recenterRequestId by remember { mutableLongStateOf(0L) }
 
     val permissionLauncher = rememberLocationPermissionLauncher(
         onPermissionGranted = {
@@ -107,18 +115,7 @@ fun TrackingScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Text(
-                            text = "Points: ${uiState.points.size}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier
-                                .testTag("tracking_points_count")
-                                .semantics { contentDescription = "Accepted Points Count" }
-                        )
-
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(
                             text = "Distance: ${uiState.distanceMeters.toInt()} m",
                             style = MaterialTheme.typography.bodyMedium,
@@ -130,7 +127,26 @@ fun TrackingScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            if (isTracking && mapContent != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Box(modifier = Modifier.fillMaxWidth().weight(1f).testTag("live_map_container")) {
+                    mapContent(uiState.toLiveMapUiState(recenterRequestId), Modifier.fillMaxSize())
+                    Button(
+                        onClick = { recenterRequestId++ },
+                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).testTag("map_recenter_button")
+                    ) {
+                        Text("Recenter")
+                    }
+                    Text(
+                        text = "© OpenStreetMap contributors",
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)
+                            .testTag("map_attribution")
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             if (!isTracking) {
                 Button(
