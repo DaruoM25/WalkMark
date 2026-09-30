@@ -1,9 +1,9 @@
 package com.walkmark.app.data.walk
 
 import com.walkmark.app.domain.location.LocationPoint
-import com.walkmark.app.domain.location.LocationTrackingState
 import com.walkmark.app.domain.repository.WalkRepository
 import com.walkmark.app.domain.walk.Walk
+import com.walkmark.app.domain.walk.WalkDeleteResult
 import com.walkmark.app.domain.walk.WalkNote
 import com.walkmark.app.domain.walk.WalkPhoto
 import com.walkmark.app.domain.walk.WalkStatus
@@ -64,8 +64,9 @@ class RecordingWalkRepository : WalkRepository {
     override suspend fun getActiveWalk(): Walk? = null
     override fun observeAllWalks(): Flow<List<Walk>> = flowOf(emptyList())
     override fun observeActiveWalk(): Flow<Walk?> = flowOf(null)
+    override fun observeWalkById(walkId: String): Flow<Walk?> = flowOf(null)
     override fun observePoints(walkId: String): Flow<List<LocationPoint>> = flowOf(emptyList())
     override fun observeNotes(walkId: String): Flow<List<WalkNote>> = flowOf(emptyList())
     override fun observePhotos(walkId: String): Flow<List<WalkPhoto>> = flowOf(emptyList())
-    override suspend fun deleteWalk(walkId: String) = Unit
+    override suspend fun deleteWalk(walkId: String): WalkDeleteResult = WalkDeleteResult.Success
 }

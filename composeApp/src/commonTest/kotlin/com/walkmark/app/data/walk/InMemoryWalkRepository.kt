@@ -1,8 +1,5 @@
 package com.walkmark.app.data.walk
 
-import com.walkmark.app.core.database.WalkMarkDatabase
-import com.walkmark.app.core.database.toDomain
-import com.walkmark.app.core.database.toEntity
 import com.walkmark.app.domain.location.LocationPoint
 import com.walkmark.app.domain.repository.LocalMediaStore
 import com.walkmark.app.domain.repository.WalkRepository
@@ -12,17 +9,22 @@ import com.walkmark.app.domain.walk.WalkNote
 import com.walkmark.app.domain.walk.WalkPhoto
 import com.walkmark.app.domain.walk.WalkStatus
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 
-class RoomWalkRepository(
-    database: WalkMarkDatabase,
+/**
+ * In-memory [WalkRepository] implementation for unit tests.
+ * Supports optional [LocalMediaStore] injection to verify media cleanup behaviour.
+ */
+class InMemoryWalkRepository(
     private val mediaStore: LocalMediaStore? = null
 ) : WalkRepository {
 
-    private val walkDao = database.walkDao()
-    private val pointDao = database.walkPointDao()
-    private val noteDao = database.walkNoteDao()
-    private val photoDao = database.walkPhotoDao()
+    private val walks = MutableStateFlow<Map<String, Walk>>(emptyMap())
+    private val points = MutableStateFlow<Map<String, List<LocationPoint>>>(emptyMap())
+    private val notes = MutableStateFlow<Map<String, List<WalkNote>>>(emptyMap())
+    private val photos = MutableStateFlow<Map<String, List<WalkPhoto>>>(emptyMap())
 
     override suspend fun startWalk(walkId: String, title: String, startTimeEpochMs: Long): Walk {
         val walk = Walk(
@@ -35,7 +37,7 @@ class RoomWalkRepository(
             durationSeconds = 0L,
             status = WalkStatus.ACTIVE
         )
-        walkDao.insert(walk.toEntity())
+        walks.update { it + (walkId to walk) }
         return walk
     }
 
@@ -44,83 +46,65 @@ class RoomWalkRepository(
         endTimeEpochMs: Long,
         totalDistanceMeters: Double
     ): Walk? {
-        val existing = walkDao.getById(walkId) ?: return null
+        val existing = walks.value[walkId] ?: return null
         val durationSeconds = ((endTimeEpochMs - existing.startTimeEpochMs).coerceAtLeast(0L)) / 1000L
         val updated = existing.copy(
             endTimeEpochMs = endTimeEpochMs,
             totalDistanceMeters = totalDistanceMeters,
             durationSeconds = durationSeconds,
-            status = WalkStatus.COMPLETED.name
+            status = WalkStatus.COMPLETED
         )
-        walkDao.update(updated)
-        return updated.toDomain()
+        walks.update { it + (walkId to updated) }
+        return updated
     }
 
     override suspend fun appendPoints(walkId: String, points: List<LocationPoint>) {
-        if (points.isEmpty()) return
-        val startSeq = (pointDao.maxSeq(walkId) ?: -1) + 1
-        val entities = points.mapIndexed { index, point ->
-            point.toEntity(walkId, startSeq + index)
+        this.points.update { map ->
+            map + (walkId to ((map[walkId] ?: emptyList()) + points))
         }
-        pointDao.insertAll(entities)
     }
 
     override suspend fun addNote(note: WalkNote) {
-        noteDao.insert(note.toEntity())
-    }
-
-    /**
-     * Inserts the photo DB record.
-     * If the insertion fails, attempts to clean up the media file (suppressing cleanup errors)
-     * and rethrows the original DB exception.
-     */
-    override suspend fun addPhoto(photo: WalkPhoto) {
-        try {
-            photoDao.insert(photo.toEntity())
-        } catch (dbError: Throwable) {
-            try {
-                mediaStore?.deletePhoto(photo.relativePath)
-            } catch (_: Throwable) {
-                // suppress cleanup failure — the original DB error is the primary failure
-            }
-            throw dbError
+        notes.update { map ->
+            map + (note.walkId to ((map[note.walkId] ?: emptyList()) + note))
         }
     }
 
-    override suspend fun getWalk(walkId: String): Walk? = walkDao.getById(walkId)?.toDomain()
+    override suspend fun addPhoto(photo: WalkPhoto) {
+        photos.update { map ->
+            map + (photo.walkId to ((map[photo.walkId] ?: emptyList()) + photo))
+        }
+    }
+
+    override suspend fun getWalk(walkId: String): Walk? = walks.value[walkId]
 
     override suspend fun getActiveWalk(): Walk? =
-        walkDao.getFirstByStatus(WalkStatus.ACTIVE.name)?.toDomain()
+        walks.value.values.firstOrNull { it.status == WalkStatus.ACTIVE }
 
     override fun observeAllWalks(): Flow<List<Walk>> =
-        walkDao.observeAll().map { list -> list.map { it.toDomain() } }
+        walks.map { it.values.sortedByDescending { w -> w.startTimeEpochMs } }
 
     override fun observeActiveWalk(): Flow<Walk?> =
-        walkDao.observeFirstByStatus(WalkStatus.ACTIVE.name).map { it?.toDomain() }
+        walks.map { it.values.firstOrNull { w -> w.status == WalkStatus.ACTIVE } }
 
     override fun observeWalkById(walkId: String): Flow<Walk?> =
-        walkDao.observeById(walkId).map { it?.toDomain() }
+        walks.map { it[walkId] }
 
     override fun observePoints(walkId: String): Flow<List<LocationPoint>> =
-        pointDao.observeByWalk(walkId).map { list -> list.map { it.toDomain() } }
+        points.map { it[walkId] ?: emptyList() }
 
     override fun observeNotes(walkId: String): Flow<List<WalkNote>> =
-        noteDao.observeByWalk(walkId).map { list -> list.map { it.toDomain() } }
+        notes.map { it[walkId] ?: emptyList() }
 
     override fun observePhotos(walkId: String): Flow<List<WalkPhoto>> =
-        photoDao.observeByWalk(walkId).map { list -> list.map { it.toDomain() } }
+        photos.map { it[walkId] ?: emptyList() }
 
-    /**
-     * Deletes the walk DB record after attempting to remove all associated media files.
-     * Media deletion failures are collected; the DB record is removed regardless.
-     * Returns [WalkDeleteResult.SuccessWithMediaCleanupFailures] if any media could not be deleted.
-     */
     override suspend fun deleteWalk(walkId: String): WalkDeleteResult {
         val failedPaths = mutableListOf<String>()
 
         if (mediaStore != null) {
-            val photos = photoDao.getByWalk(walkId)
-            for (photo in photos) {
+            val walkPhotos = photos.value[walkId] ?: emptyList()
+            for (photo in walkPhotos) {
                 try {
                     mediaStore.deletePhoto(photo.relativePath)
                 } catch (_: Throwable) {
@@ -129,7 +113,10 @@ class RoomWalkRepository(
             }
         }
 
-        walkDao.deleteById(walkId)
+        walks.update { it - walkId }
+        photos.update { it - walkId }
+        notes.update { it - walkId }
+        points.update { it - walkId }
 
         return if (failedPaths.isEmpty()) {
             WalkDeleteResult.Success
