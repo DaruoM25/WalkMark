@@ -37,7 +37,7 @@ val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
 fun App(
     locationRepository: LocationRepository? = null,
     walkRepository: WalkRepository? = null,
-    mediaStore: LocalMediaStore? = nul
+    mediaStore: LocalMediaStore? = null,
     posture: DevicePosture = DevicePosture.Normal
 ) {
     WalkMarkTheme {
@@ -88,16 +88,18 @@ fun App(
                 LocationViewModel(repository)
             }
 
-CompositionLocalProvider(LocalWalkViewModel provides walkViewModel) {
-    AdaptiveWalkScaffold(
-        posture = posture,
-        primaryContent = { _ ->
-            TrackingScreen(viewModel = viewModel)
-        },
-        secondaryContent = { _ ->
-            JournalScreen()
+            CompositionLocalProvider(LocalWalkViewModel provides walkViewModel) {
+                AdaptiveWalkScaffold(
+                    posture = posture,
+                    primaryContent = { _ ->
+                        TrackingScreen(viewModel = viewModel)
+                    },
+                    secondaryContent = { _ ->
+                        JournalScreen()
+                    }
+                )
+            }
         }
-    )
-}
+    }
 }
 
