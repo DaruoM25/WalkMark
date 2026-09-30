@@ -1,0 +1,86 @@
+# WalkMark — Story Ownership Map
+# Canonical machine-readable active story map.
+# Schema: each active story declares ownership, scope, dependencies, merge order.
+
+schema_version: 1
+stories:
+  - story_id: US-005
+    owner_agent: antigravity
+    topic: Walk History / Detail / delete semantics
+    owned_domains:
+      - walk-history
+      - walk-detail
+      - delete-semantics
+      - room-read-delete
+    owned_files:
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/domain/repository/WalkRepository.kt
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/domain/walk/Walk.kt
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/core/database/
+      - composeApp/src/commonTest/kotlin/com/walkmark/app/data/walk/
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/journal/
+    shared_high_conflict_files:
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/App.kt
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/location/LocationViewModel.kt
+    forbidden_domains:
+      - monetization
+      - help-support
+    dependencies: []
+    merge_order: after US-006 if US-006 touches shared files
+    authoritative_seam: WalkRepository / Walk entities / JournalScreen
+    scope_class: OWNED
+
+  - story_id: US-006
+    owner_agent: opencode
+    topic: Monetization / free-walk gate / paywall foundation
+    owned_domains:
+      - subscription-domain
+      - persisted-walk-count
+      - start-walk-use-case
+      - quota-gate
+      - paywall
+      - monetization-docs
+    owned_files:
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/location/LocationViewModel.kt
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/domain/walk/Walk.kt
+      # Expected new files (to be confirmed by accepted plan):
+      # - composeApp/src/commonMain/kotlin/com/walkmark/app/domain/walk/PersistedWalkCount.kt
+      # - composeApp/src/commonMain/kotlin/com/walkmark/app/domain/walk/StartWalkUseCase.kt
+    shared_high_conflict_files:
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/App.kt
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/location/LocationViewModel.kt
+    forbidden_domains:
+      - walk-history-detail
+      - help-support
+    dependencies: []
+    merge_order: after US-005 if US-005 touches LocationViewModel
+    authoritative_seam: LocationViewModel quota gate / PersistedWalkCount / StartWalkUseCase
+    scope_class: OWNED
+
+  - story_id: US-007
+    owner_agent: codex
+    topic: In-app Help & Support
+    owned_domains:
+      - help-support-screen
+      - faq
+      - support-contact-launcher
+      - support-resources-docs
+      - minimal-app-shell-entry
+    owned_files:
+      # New files expected (to be confirmed by accepted plan):
+      # - composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/help/
+      # - or composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/support/
+    shared_high_conflict_files:
+      - composeApp/src/commonMain/kotlin/com/walkmark/app/App.kt
+    forbidden_domains:
+      - walk-history-detail
+      - monetization
+    dependencies: []
+    merge_order: after US-006 if US-006 touches App.kt
+    authoritative_seam: HelpScreen / App shell navigation destination
+    scope_class: OWNED
+
+# Classification legend:
+#   OWNED       — files/domains this story owns exclusively
+#   SHARED      — files touched by multiple stories; coordination required
+#   OUT_OF_SCOPE — files this story must NOT touch without separate human approval
+

@@ -1,0 +1,60 @@
+# WalkMark — High-Conflict File Registry
+# Canonical machine-readable list of files that are frequently touched by multiple stories.
+# CI and governance checks reference this registry.
+
+schema_version: 1
+files:
+  - path: composeApp/src/commonMain/kotlin/com/walkmark/app/App.kt
+    why_high_conflict: App entry point for Android; touched by hotfixes, navigation changes, feature shell modifications
+    owner: shared
+    active_stories:
+      - US-005  # potential navigation/history touch
+      - US-006  # potential paywall destination
+      - US-007  # help/support shell destination
+    approval_required: YES
+
+  - path: composeApp/src/commonMain/kotlin/com/walkmark/app/domain/repository/WalkRepository.kt
+    why_high_conflict: Central data access layer; schema/DAO changes can break multiple features
+    owner: US-005
+    active_stories:
+      - US-005
+      - US-006  # if quota gate reads walks
+    approval_required: YES
+
+  - path: composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/location/LocationViewModel.kt
+    why_high_conflict: UI state central for location; gate integration + history may both touch
+    owner: US-006
+    active_stories:
+      - US-006
+      - US-005  # if history needs location display
+    approval_required: YES
+
+  - path: composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/location/TrackingScreen.kt
+    why_high_conflict: GPS tracking UI; map + tracking stories may both touch
+    owner: shared
+    active_stories:
+      - US-005  # if history shows tracking
+    approval_required: YES
+
+  - path: composeApp/src/commonMain/kotlin/com/walkmark/app/presentation/journal/JournalScreen.kt
+    why_high_conflict: Journal UI; history/detail + photos/notes may touch
+    owner: US-005
+    active_stories:
+      - US-005
+    approval_required: YES
+
+  - path: AGENTS.md
+    why_high_conflict: Governance document; multiple agents may propose governance changes
+    owner: shared
+    active_stories: []
+    approval_required: YES
+
+  - path: PROJECT_MAP.md
+    why_high_conflict: Project map; multiple agents may propose map updates
+    owner: shared
+    active_stories: []
+    approval_required: YES
+
+# AdaptiveWalkScaffold.kt: verified path NOT found in repo at time of governance creation.
+# Include only if/when a verified path exists.
+
