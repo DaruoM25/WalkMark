@@ -3,6 +3,69 @@
 All notable changes to WalkMark will be documented in this file.
 
 # [Unreleased]
+### Added - [VERIFIED]
+- **US-006 Phase 1: Free-walk quota gate and hard paywall (no purchase provider)**:
+  - Provider-neutral monetization domain: `SubscriptionState`/`SubscriptionStatus`,
+    `SubscriptionManager` with `PurchaseResult`/`RestoreResult` (including `Unavailable`),
+    `PaywallProduct`/`Offering`/`OfferingsState`, and the pure
+    `WalkCreationAccessPolicy` decision function with `FREE_WALK_LIMIT = 3`.
+  - Narrow `PersistedWalkCount` port (`walkCount: Flow<Int>`, `currentWalkCount(): Int`) plus
+    the production adapter `WalkRepositoryWalkCount`, which only delegates to the existing
+    `WalkRepository.observeAllWalks()`. **No second `WalkRepository` implementation exists.**
+  - `StartWalkUseCase` as the authoritative *may-tracking-start* gate. It re-reads the walk
+    count at call time so a stale retained `StateFlow` can never grant a walk, and on denial it
+    performs **no side effect at all** - tracking never starts and nothing is persisted.
+  - `UnavailableSubscriptionManager` in `commonMain`: a production-safe `NOT_CONFIGURED`
+    fallback that never fabricates an entitlement or a loaded offering, and returns
+    `PurchaseResult.Unavailable` / `RestoreResult.Unavailable`. Mutable
+    `FakeSubscriptionManager` is `commonTest`-only.
+  - `LocationViewModel` gate integration with a **synchronous** in-flight guard
+    (`isStartingWalk` set before launching, reset in `finally`), so N concurrent Start taps
+    produce exactly one gate invocation. `TrackingScreen` binds
+    `enabled = !isStartingWalk && !isTracking` on the real Start control while preserving
+    `testTag("start_walk_button")`, its contentDescription, and the existing
+    permission-launcher sequence.
+  - `HardPaywallSheet` + `HardPaywallUiState`: dismissible to Main via a visible Close control
+    and system Back. Dismissal sets only presentation visibility - it never mutates quota,
+    entitlement, walk count, or any persistent state, and creates no
+    `alreadyOffered`/`paywallDismissed` latch. The next Start Walk tap re-runs the gate.
+  - **No fabricated runtime prices.** When offerings are unavailable the paywall renders **no
+    price row at all** (`showsStorePrices == false`, `products` empty). Instead it shows the
+    title `Subscription required`, an explanation that purchases are not available in this
+    build, the provider status `Provider not configured`, and disabled subscribe/restore
+    controls. Planned pricing ($2.99/week, $19.99/year) is documentation-only and appears in
+    no `.kt` / `.kts` / `.xml` / `.json` file in the repository.
+  - No Material Icons dependency added; the close affordance is a dependency-free `TextButton`.
+
+  Scope boundaries honoured:
+  - `WalkRepository.kt`, `RoomWalkRepository.kt` and Room schema **unchanged**.
+  - `WalkSessionRecorder` remains the `Walk` row creation owner; persistence is not moved into
+    the gate.
+  - No dependency change, no toolchain change, no schema change.
+
+  Verification:
+  - Full JVM unit-test suite **BUILD SUCCESSFUL** - 30 suites, 170 tests, 170 passed,
+    0 failed, 0 skipped. Measured baseline on `origin/main` @ `6386460` was 19 suites /
+    98 tests, so this change is strictly additive with no regression.
+  - `:composeApp:compileDebugKotlinAndroid` **PASS**.
+  - New suites: `WalkCreationAccessPolicyTest` (8), `StartWalkUseCaseTest` (8),
+    `LocationViewModelStartWalkGateTest` (10), `UnavailableSubscriptionManagerTest` (9),
+    `FakeSubscriptionManagerTest` (8), `HardPaywallUiStateTest` (6),
+    `HardPaywallSheetComposeTest` (6), `MonetizationDomainArchitectureTest` (9).
+  - Gate coverage: allow below limit, allow at 2nd free walk, deny at 4th with zero side
+    effects, entitled bypass, stale-snapshot denial, count re-read per call, double-tap
+    single invocation, dismissal-does-not-grant-access, paywall re-shown on next tap.
+
+  Not verified / deferred:
+  - Android instrumentation runtime: **NOT VERIFIED** (no emulator run in this pass).
+  - iOS actual compilation and runtime: **NOT VERIFIED ON WINDOWS** (no Xcode toolchain).
+  - Real billing: **NOT APPLICABLE** - no purchase provider exists by design in Phase 1.
+
+  Docs: `docs/user-guide/subscriptions.md`,
+  `docs/architecture/decisions/0001-initial-architecture.md` (Addendum),
+  `docs/architecture/overview.md`, `docs/architecture/modules.md`,
+  `docs/architecture/navigation.md`.
+
 ### Added - [ACCEPTED_WITH_RUNTIME_WAIVER]
 - **US-003A: Local Walk Persistence, Notes, and Photos**:
   - Room KMP database at schema version 2 with five entities: `Walk`, accepted GPS `WalkPoint`,

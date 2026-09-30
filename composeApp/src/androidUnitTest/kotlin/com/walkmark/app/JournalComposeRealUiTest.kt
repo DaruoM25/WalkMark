@@ -1,16 +1,22 @@
-﻿package com.walkmark.app
+package com.walkmark.app
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import com.walkmark.app.data.monetization.FakeSubscriptionManager
 import com.walkmark.app.domain.location.LocationPoint
 import com.walkmark.app.domain.location.LocationRepository
 import com.walkmark.app.domain.location.LocationTrackingState
+import com.walkmark.app.domain.monetization.SubscriptionState
+import com.walkmark.app.domain.walk.StartWalkUseCase
 import com.walkmark.app.presentation.journal.JournalScreen
 import com.walkmark.app.presentation.location.LocationViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
 import com.walkmark.app.presentation.theme.WalkMarkTheme
+import com.walkmark.app.testing.StubPersistedWalkCount
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +32,17 @@ class JournalComposeRealUiTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private fun viewModelFor(repo: LocationRepository): LocationViewModel = LocationViewModel(
+        locationRepository = repo,
+        startWalk = StartWalkUseCase(
+            subscriptionManager = FakeSubscriptionManager(SubscriptionState.free()),
+            walkCount = StubPersistedWalkCount(0),
+            locationRepository = repo,
+            scope = CoroutineScope(Dispatchers.Unconfined)
+        )
+    )
+
 
     private class FakeTestRepo(
         initialState: LocationTrackingState = LocationTrackingState.Idle
@@ -71,7 +88,7 @@ class JournalComposeRealUiTest {
     @Test
     fun testTrackingScreenRendersIdleStateWithStartButton() {
         val repo = FakeTestRepo(LocationTrackingState.Idle)
-        val viewModel = LocationViewModel(repo)
+        val viewModel = viewModelFor(repo)
 
         composeTestRule.setContent {
             WalkMarkTheme {
@@ -90,7 +107,7 @@ class JournalComposeRealUiTest {
     @Test
     fun testTrackingScreenRendersTrackingStateWithStopButton() {
         val repo = FakeTestRepo(LocationTrackingState.Tracking(1000L))
-        val viewModel = LocationViewModel(repo)
+        val viewModel = viewModelFor(repo)
 
         composeTestRule.setContent {
             WalkMarkTheme {

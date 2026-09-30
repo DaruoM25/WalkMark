@@ -5,10 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.walkmark.app.domain.location.LocationPoint
 import com.walkmark.app.domain.location.LocationRepository
 import com.walkmark.app.domain.location.LocationTrackingState
+import com.walkmark.app.domain.monetization.WalkCreationAccess
+import com.walkmark.app.domain.walk.StartWalkUseCase
+import com.walkmark.app.domain.walk.WalkStartResult
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class LocationTrackingUiState(
     val state: LocationTrackingState = LocationTrackingState.Idle,
@@ -19,8 +25,19 @@ data class LocationTrackingUiState(
 )
 
 class LocationViewModel(
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val startWalk: StartWalkUseCase
 ) : ViewModel() {
+
+    private val _startResult = MutableStateFlow<WalkStartResult?>(null)
+    val startResult: StateFlow<WalkStartResult?> = _startResult.asStateFlow()
+
+    private val _isStartingWalk = MutableStateFlow(false)
+    val isStartingWalk: StateFlow<Boolean> = _isStartingWalk.asStateFlow()
+
+    val walkCreationAccess: StateFlow<WalkCreationAccess> = startWalk.access
+
+    val freeWalkCount: StateFlow<Int> = startWalk.freeWalkCount
 
     val uiState: StateFlow<LocationTrackingUiState> = combine(
         locationRepository.trackingState,
@@ -43,7 +60,19 @@ class LocationViewModel(
     )
 
     fun startTracking() {
-        locationRepository.startTracking()
+        if (_isStartingWalk.value) return
+        _isStartingWalk.value = true
+        viewModelScope.launch {
+            try {
+                _startResult.value = startWalk.startWalk()
+            } finally {
+                _isStartingWalk.value = false
+            }
+        }
+    }
+
+    fun consumeStartResult() {
+        _startResult.value = null
     }
 
     fun pauseTracking() {
