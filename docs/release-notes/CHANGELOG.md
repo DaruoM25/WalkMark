@@ -3,6 +3,12 @@
 All notable changes to WalkMark will be documented in this file.
 
 # [Unreleased]
+### Added - [IMPLEMENTED]
+- **US-007: In-App User Support**:
+  - Dedicated local Help & Support destination with approved FAQ and troubleshooting topics.
+  - Privacy-preserving, user-initiated email contact through Android and iOS platform launchers.
+  - No diagnostics, private walk content, telemetry, backend, support SDK, or new permission.
+
 ### Added - [VERIFIED]
 - **US-006 Phase 1: Free-walk quota gate and hard paywall (no purchase provider)**:
   - Provider-neutral monetization domain: `SubscriptionState`/`SubscriptionStatus`,
