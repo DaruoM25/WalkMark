@@ -1,7 +1,6 @@
 ﻿package com.walkmark.app
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,7 +35,6 @@ import com.walkmark.app.data.monetization.UnavailableSubscriptionManager
 import com.walkmark.app.data.monetization.WalkRepositoryWalkCount
 import com.walkmark.app.data.walk.RoomWalkRepository
 import com.walkmark.app.data.walk.WalkSessionRecorder
-import com.walkmark.app.domain.export.ExportWalkUseCase
 import com.walkmark.app.domain.location.LocationRepository
 import com.walkmark.app.domain.location.rememberLocationTrackerManager
 import com.walkmark.app.domain.monetization.SubscriptionManager
@@ -47,9 +45,6 @@ import com.walkmark.app.domain.walk.StartWalkUseCase
 import com.walkmark.app.domain.walk.WalkStartResult
 import com.walkmark.app.presentation.adaptive.AdaptiveWalkScaffold
 import com.walkmark.app.presentation.adaptive.DevicePosture
-import com.walkmark.app.presentation.export.SavedWalksScreen
-import com.walkmark.app.presentation.export.SavedWalksViewModel
-import com.walkmark.app.presentation.export.rememberGpxShareLauncher
 import com.walkmark.app.presentation.journal.JournalScreen
 import com.walkmark.app.presentation.location.LocationViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
@@ -61,7 +56,6 @@ import com.walkmark.app.presentation.theme.WalkMarkTheme
 import com.walkmark.app.presentation.walk.WalkViewModel
 import org.jetbrains.compose.resources.stringResource
 import walkmark.composeapp.generated.resources.Res
-import walkmark.composeapp.generated.resources.saved_walks_entry
 import walkmark.composeapp.generated.resources.support_entry
 
 val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
@@ -70,7 +64,6 @@ val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
 
 private enum class RootDestination {
     Main,
-    SavedWalks,
     Support
 }
 
@@ -148,17 +141,6 @@ fun App(
                 )
             }
 
-            val gpxShareLauncher = rememberGpxShareLauncher()
-
-            val savedWalksViewModel = remember(walks, gpxShareLauncher, scope) {
-                SavedWalksViewModel(
-                    walkRepository = walks,
-                    exportWalk = ExportWalkUseCase(walks),
-                    gpxShareLauncher = gpxShareLauncher,
-                    scope = scope
-                )
-            }
-
             val startResult by viewModel.startResult.collectAsState()
             val freeWalkCount by viewModel.freeWalkCount.collectAsState()
             val offerings by subscriptions.offerings.collectAsState()
@@ -185,34 +167,18 @@ fun App(
                                 JournalScreen()
                             }
                         )
-                        Row(
+                        TextButton(
+                            onClick = { destination = RootDestination.Support },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .windowInsetsPadding(WindowInsets.safeDrawing)
                                 .padding(8.dp)
+                                .testTag("support_entry_button")
+                                .semantics { contentDescription = "Help and Support" }
                         ) {
-                            TextButton(
-                                onClick = { destination = RootDestination.SavedWalks },
-                                modifier = Modifier
-                                    .testTag("saved_walks_entry_button")
-                                    .semantics { contentDescription = "Saved Walks" }
-                            ) {
-                                Text(stringResource(Res.string.saved_walks_entry))
-                            }
-                            TextButton(
-                                onClick = { destination = RootDestination.Support },
-                                modifier = Modifier
-                                    .testTag("support_entry_button")
-                                    .semantics { contentDescription = "Help and Support" }
-                            ) {
-                                Text(stringResource(Res.string.support_entry))
-                            }
+                            Text(stringResource(Res.string.support_entry))
                         }
                     }
-                    RootDestination.SavedWalks -> SavedWalksScreen(
-                        viewModel = savedWalksViewModel,
-                        onBack = { destination = RootDestination.Main }
-                    )
                     RootDestination.Support -> SupportScreen(
                         contactConfig = supportContactConfig,
                         onBack = { destination = RootDestination.Main }

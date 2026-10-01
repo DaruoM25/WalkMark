@@ -4,7 +4,6 @@ import com.walkmark.app.data.walk.InMemoryWalkRepository
 import com.walkmark.app.domain.export.ExportWalkUseCase
 import com.walkmark.app.domain.location.LocationPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -16,7 +15,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SavedWalksViewModelTest {
+class GpxExportViewModelTest {
 
     private val repository = InMemoryWalkRepository()
 
@@ -61,7 +60,7 @@ class SavedWalksViewModelTest {
     @Test
     fun initialStateIsIdle() = runTest {
         val scope = newScope()
-        val viewModel = SavedWalksViewModel(repository, ExportWalkUseCase(repository), RecordingLauncher(), scope)
+        val viewModel = GpxExportViewModel(ExportWalkUseCase(repository), RecordingLauncher(), scope)
 
         assertIs<WalkExportState.Idle>(viewModel.exportState.value)
     }
@@ -71,7 +70,7 @@ class SavedWalksViewModelTest {
         val scope = newScope()
         seedCompletedWalk()
         val launcher = RecordingLauncher(GpxShareResult.Shared)
-        val viewModel = SavedWalksViewModel(repository, ExportWalkUseCase(repository), launcher, scope)
+        val viewModel = GpxExportViewModel(ExportWalkUseCase(repository), launcher, scope)
 
         viewModel.exportGpx("walk-1")
         scope.advanceUntilIdle()
@@ -87,8 +86,7 @@ class SavedWalksViewModelTest {
     fun launcherFailureReportsErrorWithoutFilesystemPath() = runTest {
         val scope = newScope()
         seedCompletedWalk()
-        val viewModel = SavedWalksViewModel(
-            repository,
+        val viewModel = GpxExportViewModel(
             ExportWalkUseCase(repository),
             RecordingLauncher(GpxShareResult.Failure),
             scope
@@ -107,8 +105,7 @@ class SavedWalksViewModelTest {
     fun noCompatibleAppReportsDedicatedError() = runTest {
         val scope = newScope()
         seedCompletedWalk()
-        val viewModel = SavedWalksViewModel(
-            repository,
+        val viewModel = GpxExportViewModel(
             ExportWalkUseCase(repository),
             RecordingLauncher(GpxShareResult.NoCompatibleApp),
             scope
@@ -125,7 +122,7 @@ class SavedWalksViewModelTest {
     fun missingWalkReportsWalkNotFoundAndNeverCallsLauncher() = runTest {
         val scope = newScope()
         val launcher = RecordingLauncher()
-        val viewModel = SavedWalksViewModel(repository, ExportWalkUseCase(repository), launcher, scope)
+        val viewModel = GpxExportViewModel(ExportWalkUseCase(repository), launcher, scope)
 
         viewModel.exportGpx("does-not-exist")
         scope.advanceUntilIdle()
@@ -140,7 +137,7 @@ class SavedWalksViewModelTest {
         val scope = newScope()
         seedCompletedWalk()
         val launcher = RecordingLauncher(autoComplete = false)
-        val viewModel = SavedWalksViewModel(repository, ExportWalkUseCase(repository), launcher, scope)
+        val viewModel = GpxExportViewModel(ExportWalkUseCase(repository), launcher, scope)
 
         viewModel.exportGpx("walk-1")
         scope.advanceUntilIdle()
@@ -157,29 +154,10 @@ class SavedWalksViewModelTest {
     }
 
     @Test
-    fun walkListExposesOnlyCompletedWalks() = runTest {
-        val scope = newScope()
-        seedCompletedWalk(walkId = "walk-1")
-        repository.startWalk(walkId = "walk-active", title = "In progress", startTimeEpochMs = 1_700_000_100_000L)
-        val viewModel = SavedWalksViewModel(repository, ExportWalkUseCase(repository), RecordingLauncher(), scope)
-
-        // `walks` uses WhileSubscribed, so the upstream only runs while a collector is active.
-        val observed = mutableListOf<List<String>>()
-        val collector = backgroundScope.launch {
-            viewModel.walks.collect { walks -> observed += walks.map { it.id } }
-        }
-        advanceUntilIdle()
-        collector.cancel()
-
-        assertTrue(observed.last().contains("walk-1"), observed.toString())
-        assertFalse(observed.last().contains("walk-active"), observed.toString())
-    }
-
-    @Test
     fun resetReturnsStateToIdle() = runTest {
         val scope = newScope()
         seedCompletedWalk()
-        val viewModel = SavedWalksViewModel(repository, ExportWalkUseCase(repository), RecordingLauncher(), scope)
+        val viewModel = GpxExportViewModel(ExportWalkUseCase(repository), RecordingLauncher(), scope)
 
         viewModel.exportGpx("walk-1")
         scope.advanceUntilIdle()

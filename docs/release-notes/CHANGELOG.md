@@ -21,13 +21,13 @@ All notable changes to WalkMark will be documented in this file.
   - Deterministic filename `walkmark-<sanitized-title>-<walk-id>.gpx`, degrading to
     `walkmark-<walk-id>.gpx`. Both segments use an `[A-Za-z0-9-_]` allow-list with bounded length,
     so a walk title can never produce a path separator or a `..` traversal segment.
-  - New lightweight **Saved Walks** destination (`RootDestination.SavedWalks`) listing completed
-    walks with a per-walk `Export / Share GPX` action, reached from the main screen.
-  - `SavedWalksViewModel` is platform-neutral: it depends only on `WalkRepository`,
-    `ExportWalkUseCase`, and the provider-neutral `GpxShareLauncher` interface, and holds no
-    `Context`, `Intent`, `Uri`, `NSURL`, or filesystem path. `WalkExportState` is
+  - `GpxExportViewModel` is platform-neutral: it depends only on `ExportWalkUseCase` and the
+    provider-neutral `GpxShareLauncher` interface, and holds no `Context`, `Intent`, `Uri`,
+    `NSURL`, or filesystem path. `WalkExportState` is
     `Idle / Exporting / Success / Error`, with an `InProgress` re-entrancy guard that suppresses
     duplicate export requests. `Error` carries a closed enum reason, never an exception message.
+    It owns **no walk list, no history, and no navigation**; a caller supplies the id of the walk
+    the user chose to export.
   - `GpxShareLauncher` expect/actual following the existing `SupportContactLauncher` pattern.
     Android writes to the **app-private cache only** (`walkmark-gpx/`), shares via
     `androidx.core.content.FileProvider` + `ACTION_SEND` + `application/gpx+xml` +
@@ -43,24 +43,34 @@ All notable changes to WalkMark will be documented in this file.
     existing `androidx.activity:activity-compose`; `libs.versions.toml` is unchanged.
   - Out of scope and not implemented: GPX import, cloud backup, sync, bulk export, ZIP archive,
     photo export, note export, background export, scheduled backup.
-  - `App.kt` change limited to the new destination plus a `Row` wrapping the existing
-    `support_entry_button`, whose testTag and behaviour are preserved.
+  - **`App.kt` is NOT changed.** `strings.xml` is NOT changed. No root destination, no entry
+    button, no navigation wiring, and no History/Detail UI is introduced by US-011.
+
+  Ownership:
+  - US-005B is the sole owner of the History list, Walk Detail, and navigation to persisted walks.
+    A prior US-011 commit (`d8bd662`) introduced a competing `Saved Walks` destination and
+    `SavedWalksScreen` in `App.kt`; a corrective follow-up commit removed all of it, so US-011
+    ships as **infrastructure only**. The future user-facing action is an *Export GPX* button
+    added to the canonical Walk Detail UI by that story - deliberately not implemented here.
+    Because there is no entry point yet, `docs/user-guide/export-gpx.md` documents the file
+    format and platform behaviour rather than a user task.
 
   Verification status (partial - verification debt OPEN):
   - `:composeApp:compileDebugKotlinAndroid` **PASS** on the `c53c8d8` baseline and **PASS** after
-    the change. This confirms `androidx.core.content.FileProvider` resolves through the existing
-    `androidx.activity:activity-compose` graph with **no new dependency**, and that `App.kt`,
-    the new resources, and the Android actual all compile.
+    the initial implementation. This confirms `androidx.core.content.FileProvider` resolves
+    through the existing `androidx.activity:activity-compose` graph with **no new dependency**,
+    and that the Android actual and new resources compile.
+  - **That PASS was produced before the isolation correction.** The corrective commit renames
+    `SavedWalksViewModel` to `GpxExportViewModel` and drops the walk-list projection, and it is
+    therefore **NOT VERIFIED ON THE FINAL TIP**.
   - `:composeApp:testDebugUnitTest` **NOT PASSING / NOT VERIFIED**. The first run failed at
     `:composeApp:compileDebugUnitTestKotlinAndroid` because a test helper returned the
     `CoroutineScope` interface instead of `TestScope`, so `advanceUntilIdle()` was unresolved.
-    That defect and a `WhileSubscribed` subscription bug in the walk-list test were corrected
-    **statically**; the suite has **not** been re-run, so no test pass is claimed.
+    That defect was corrected **statically**; the suite has never passed, so no test pass is claimed.
   - `:composeApp:assembleDebug` **NOT RUN**. The `FileProvider` provider declaration and
-    `res/xml/file_paths.xml` linkage are therefore statically audited but **not** proven by a
-    successful build.
-  - New test suites awaiting execution: `GpxDocumentGeneratorTest` (13),
-    `ExportWalkUseCaseTest` (8), `SavedWalksViewModelTest` (8), `GpxShareLauncherTest` (1).
+    `res/xml/file_paths.xml` linkage are statically audited but **not** proven by a successful build.
+  - Test suites awaiting first successful execution: `GpxDocumentGeneratorTest` (13),
+    `ExportWalkUseCaseTest` (8), `GpxExportViewModelTest` (7), `GpxShareLauncherTest` (1).
 
   Not verified / deferred:
   - iOS actual compilation and runtime: **NOT VERIFIED ON WINDOWS** (`ENVIRONMENT_BLOCKED` /
@@ -70,7 +80,7 @@ All notable changes to WalkMark will be documented in this file.
     created; that commit touches only two `androidUnitTest` support files and does not overlap
     US-011, but the branch is one commit behind `main` and has not been rebased or merged.
 
-  Docs: `docs/user-guide/export-gpx.md`, `docs/user-guide/walk-history.md`.
+  Docs: `docs/user-guide/export-gpx.md`.
 
 ### Added - [IMPLEMENTED]
 - **US-007: In-App User Support**:

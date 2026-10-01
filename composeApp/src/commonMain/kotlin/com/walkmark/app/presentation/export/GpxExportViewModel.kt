@@ -2,17 +2,11 @@ package com.walkmark.app.presentation.export
 
 import com.walkmark.app.domain.export.ExportWalkUseCase
 import com.walkmark.app.domain.export.WalkExportResult
-import com.walkmark.app.domain.repository.WalkRepository
-import com.walkmark.app.domain.walk.Walk
-import com.walkmark.app.domain.walk.WalkStatus
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 enum class WalkExportError {
@@ -29,27 +23,21 @@ sealed interface WalkExportState {
 }
 
 /**
- * Presentation state for the saved-walks export flow.
+ * Export action state for a single already-persisted walk.
  *
- * Platform-neutral by construction: it depends only on [WalkRepository], the domain
- * [ExportWalkUseCase], and the provider-neutral [GpxShareLauncher]. It holds no Context,
- * Intent, Uri, NSURL, or filesystem path, and [WalkExportState.Error] carries a closed
- * enum reason rather than an exception message so no internal detail reaches the UI.
+ * Platform-neutral by construction: it depends only on the domain [ExportWalkUseCase] and the
+ * provider-neutral [GpxShareLauncher]. It holds no Context, Intent, Uri, NSURL, or filesystem
+ * path, and [WalkExportState.Error] carries a closed enum reason rather than an exception message
+ * so no internal detail can reach the UI.
+ *
+ * It owns no walk list, no history, and no navigation: those belong to the canonical Walk Detail
+ * UI. A caller supplies the walk id of the walk the user chose to export.
  */
-class SavedWalksViewModel(
-    walkRepository: WalkRepository,
+class GpxExportViewModel(
     private val exportWalk: ExportWalkUseCase,
     private val gpxShareLauncher: GpxShareLauncher,
     private val scope: CoroutineScope
 ) {
-
-    val walks: StateFlow<List<Walk>> = walkRepository.observeAllWalks()
-        .map { persisted -> persisted.filter { it.status == WalkStatus.COMPLETED } }
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
-            initialValue = emptyList()
-        )
 
     private val _exportState = MutableStateFlow<WalkExportState>(WalkExportState.Idle)
     val exportState: StateFlow<WalkExportState> = _exportState.asStateFlow()
@@ -59,9 +47,9 @@ class SavedWalksViewModel(
     }
 
     /**
-     * Generates the GPX document and hands it to the platform share mechanism.
-     * Ignored while an export is already in flight so a single walk cannot produce
-     * duplicate share requests.
+     * Generates the GPX document for [walkId] and hands it to the platform share mechanism.
+     * Ignored while an export is already in flight, so one walk can never produce duplicate
+     * share requests.
      */
     fun exportGpx(walkId: String) {
         if (_exportState.value is WalkExportState.Exporting) return
@@ -97,9 +85,5 @@ class SavedWalksViewModel(
                 }
             }
         }
-    }
-
-    private companion object {
-        const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }
