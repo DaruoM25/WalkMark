@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.walkmark.app.data.walk.RecordingWalkRepository
 import com.walkmark.app.domain.location.LocationPoint
 import com.walkmark.app.domain.location.LocationRepository
@@ -68,9 +69,9 @@ class AppSupportNavigationTest {
 
         composeTestRule.onNodeWithTag("stop_walk_button").assertIsDisplayed()
         composeTestRule.onNodeWithTag("nav_account").assertIsDisplayed().performClick()
-        composeTestRule.onNodeWithTag("settings_entry_button").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("settings_entry_button").performScrollTo().assertIsDisplayed().performClick()
         composeTestRule.onNodeWithTag("settings_screen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("settings_support_button").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("settings_support_button").performScrollTo().assertIsDisplayed().performClick()
         composeTestRule.onNodeWithTag("support_screen").assertIsDisplayed()
         composeTestRule.onNodeWithTag("support_back_button").performClick()
         composeTestRule.onNodeWithTag("settings_screen").assertIsDisplayed()
