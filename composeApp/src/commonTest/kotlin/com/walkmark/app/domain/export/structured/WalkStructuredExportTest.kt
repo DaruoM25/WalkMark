@@ -62,9 +62,9 @@ class WalkStructuredExportTest {
             id = "note-1",
             walkId = "walk-123",
             text = "Saw a deer near the lake.",
-            createdAtEpochMs = 1700001500000L,
             latitude = 48.8575,
-            longitude = 2.3535
+            longitude = 2.3535,
+            createdAtEpochMs = 1700001500000L
         )
     )
 
@@ -72,10 +72,12 @@ class WalkStructuredExportTest {
         WalkPhoto(
             id = "photo-1",
             walkId = "walk-123",
-            uri = "content://media/photos/1",
-            createdAtEpochMs = 1700002500000L,
             latitude = 48.8580,
-            longitude = 2.3540
+            longitude = 2.3540,
+            relativePath = "photos/walk-123/img_001.jpg",
+            mimeType = "image/jpeg",
+            byteSize = 1048576L,
+            createdAtEpochMs = 1700002500000L
         )
     )
 
@@ -146,7 +148,7 @@ class WalkStructuredExportTest {
         val parsed = Json.parseToJsonElement(result.content).jsonObject
         assertNotNull(parsed)
         assertEquals("Morning Trail Walk & Run \"Sunny\"", parsed["title"]?.jsonPrimitive?.content)
-        assertTrue(result.content.contains("\"Sunny\"") || result.content.contains("Sunny"))
+        assertTrue(result.content.contains("Sunny"))
     }
 
     @Test
@@ -158,7 +160,7 @@ class WalkStructuredExportTest {
         assertIs<WalkStructuredExportResult.Success>(result)
 
         assertFalse(result.content.contains("relativePath"))
-        assertFalse(result.content.contains("content://media/photos/1"))
+        assertFalse(result.content.contains("photos/walk-123/img_001.jpg"))
         assertFalse(result.content.contains("/data/"))
         assertFalse(result.content.contains("C:\\"))
     }

@@ -47,8 +47,8 @@ internal data class NoteExportDto(
 @Serializable
 internal data class PhotoExportDto(
     val id: String,
-    val mimeType: String = "image/jpeg",
-    val byteSize: Long = 0L,
+    val mimeType: String,
+    val byteSize: Long,
     val createdAt: Long,
     val latitude: Double?,
     val longitude: Double?
@@ -101,8 +101,8 @@ object WalkStructuredExportGenerator {
             photos = photos.map { photo ->
                 PhotoExportDto(
                     id = photo.id,
-                    mimeType = "image/jpeg",
-                    byteSize = 0L,
+                    mimeType = photo.mimeType,
+                    byteSize = photo.byteSize,
                     createdAt = photo.createdAtEpochMs,
                     latitude = photo.latitude,
                     longitude = photo.longitude
