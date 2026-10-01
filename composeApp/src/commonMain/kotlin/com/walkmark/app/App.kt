@@ -1,16 +1,17 @@
 package com.walkmark.app
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.weight
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -22,12 +23,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.walkmark.app.core.database.createRoomDatabase
 import com.walkmark.app.core.database.getDatabaseBuilder
 import com.walkmark.app.data.location.DefaultLocationRepository
@@ -77,6 +76,7 @@ private enum class RootDestination {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun App(
     locationRepository: LocationRepository? = null,
     walkRepository: WalkRepository? = null,
@@ -175,47 +175,68 @@ fun App(
 
             CompositionLocalProvider(LocalWalkViewModel provides walkViewModel) {
                 when (destination) {
-                    RootDestination.Main -> Box(Modifier.fillMaxSize()) {
-                        AdaptiveWalkScaffold(
-                            posture = posture,
-                            primaryContent = { _ ->
-                                TrackingScreen(viewModel = viewModel)
-                            },
-                            secondaryContent = { _ ->
-                                WalkHistoryScreen(
-                                    repository = walks,
-                                    onOpenWalk = { selectedWalkId = it; destination = RootDestination.Detail }
+                    RootDestination.Main -> Column(Modifier.fillMaxSize()) {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "WalkMark",
+                                    style = MaterialTheme.typography.titleLarge
                                 )
                             }
                         )
-                        Row(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .windowInsetsPadding(WindowInsets.safeDrawing)
-                                .padding(8.dp)
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ) {
-                            TextButton(
-                                onClick = { historyNotice = null; destination = RootDestination.History },
-                                modifier = Modifier.testTag("history_entry_button")
-                            ) {
-                                Text("History")
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                TextButton(
+                                    onClick = { historyNotice = null; destination = RootDestination.History },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag("history_entry_button")
+                                ) {
+                                    Text("History", style = MaterialTheme.typography.labelLarge)
+                                }
+                                TextButton(
+                                    onClick = { destination = RootDestination.Settings },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag("settings_entry_button")
+                                        .semantics { contentDescription = "Settings" }
+                                ) {
+                                    Text(
+                                        stringResource(Res.string.settings_entry),
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                                TextButton(
+                                    onClick = { destination = RootDestination.Support },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag("support_entry_button")
+                                        .semantics { contentDescription = "Help and Support" }
+                                ) {
+                                    Text(
+                                        stringResource(Res.string.support_entry),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        maxLines = 1
+                                    )
+                                }
                             }
-                            TextButton(
-                                onClick = { destination = RootDestination.Settings },
-                                modifier = Modifier
-                                    .testTag("settings_entry_button")
-                                    .semantics { contentDescription = "Settings" }
-                            ) {
-                                Text(stringResource(Res.string.settings_entry))
-                            }
-                            TextButton(
-                                onClick = { destination = RootDestination.Support },
-                                modifier = Modifier
-                                    .testTag("support_entry_button")
-                                    .semantics { contentDescription = "Help and Support" }
-                            ) {
-                                Text(stringResource(Res.string.support_entry))
-                            }
+                        }
+                        Box(Modifier.weight(1f)) {
+                            AdaptiveWalkScaffold(
+                                posture = posture,
+                                primaryContent = { _ ->
+                                    TrackingScreen(viewModel = viewModel)
+                                },
+                                secondaryContent = { _ ->
+                                    WalkHistoryScreen(
+                                        repository = walks,
+                                        onOpenWalk = { selectedWalkId = it; destination = RootDestination.Detail }
+                                    )
+                                }
+                            )
                         }
                     }
                     RootDestination.Settings -> SettingsScreen(
