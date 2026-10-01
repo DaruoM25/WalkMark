@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -74,12 +72,12 @@ fun HomeScreen(
             .testTag("home_screen")
             .semantics { contentDescription = "WalkMark Home Screen" }
     ) {
-        // === Live Map (55-65% of portrait content) ===
+        // === Live Map (occupies available hero space) ===
         if (mapContent != null) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.6f)
+                    .weight(1f)
                     .testTag("home_map_container")
             ) {
                 mapContent(liveMapState, Modifier.fillMaxSize())
@@ -89,7 +87,7 @@ fun HomeScreen(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.6f)
+                    .weight(1f)
                     .testTag("home_map_placeholder"),
                 color = MaterialTheme.colorScheme.surfaceVariant
             ) {
@@ -107,8 +105,6 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.4f)
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
