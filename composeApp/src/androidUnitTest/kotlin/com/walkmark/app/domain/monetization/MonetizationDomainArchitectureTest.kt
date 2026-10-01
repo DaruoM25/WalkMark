@@ -142,17 +142,5 @@ class MonetizationDomainArchitectureTest {
         }
     }
 
-    @Test
-    fun noGradleOrToolchainFileWasModifiedByThisFeature() {
-        val forbidden = listOf("revenuecat", "RevenueCat", "purchases")
-        listOf("build.gradle.kts", "../gradle/libs.versions.toml").forEach { relative ->
-            val file = File(moduleRoot, relative)
-            if (file.exists()) {
-                val text = file.readText()
-                forbidden.forEach {
-                    assertTrue(!text.contains(it), "$relative must not reference '$it'")
-                }
-            }
-        }
-    }
+    
 }

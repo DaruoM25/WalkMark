@@ -108,118 +108,6 @@ fun SettingsScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Section 0: Account
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("settings_section_account")
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Account",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "Manage your authentication status, log in or register.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Button(
-                        onClick = onNavigateToAccount,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("settings_account_button")
-                            .semantics { contentDescription = "Manage Account" }
-                    ) {
-                        Text("Manage Account")
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Section 0.5: Jury Promo Access
-            if (juryPromoManager != null) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("settings_section_promo")
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(
-                            text = "Jury Promo Access",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Spacer(Modifier.height(8.dp))
-
-                        if (isPromoActive) {
-                            Text(
-                                text = "Jury access active (valid through " + (promoValidUntil ?: JuryPromoManager.VALID_UNTIL) + ")",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.testTag("jury_promo_active_badge")
-                            )
-                        } else {
-                            Text(
-                                text = "Enter a jury promo code for temporary full premium access.",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Spacer(Modifier.height(8.dp))
-
-                            OutlinedTextField(
-                                value = promoInput,
-                                onValueChange = { promoInput = it },
-                                label = { Text("Promo Code") },
-                                singleLine = true,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag("promo_code_input")
-                            )
-
-                            Spacer(Modifier.height(8.dp))
-
-                            Button(
-                                onClick = {
-                                    val result = juryPromoManager.activate(promoInput)
-                                    when (result) {
-                                        is PromoActivationResult.Success -> {
-                                            promoFeedback = "Jury access active through " + result.validUntil
-                                            isPromoError = false
-                                        }
-                                        PromoActivationResult.Expired -> {
-                                            promoFeedback = "Promo code has expired"
-                                            isPromoError = true
-                                        }
-                                        PromoActivationResult.InvalidCode -> {
-                                            promoFeedback = "Invalid promo code"
-                                            isPromoError = true
-                                        }
-                                    }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag("activate_promo_button")
-                            ) {
-                                Text("Activate")
-                            }
-
-                            promoFeedback?.let { feedback ->
-                                Spacer(Modifier.height(8.dp))
-                                Text(
-                                    text = feedback,
-                                    color = if (isPromoError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.testTag("promo_feedback_text")
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-            }
-
             // Section 1: Privacy & Local Data
             Card(
                 modifier = Modifier
@@ -338,7 +226,119 @@ fun SettingsScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Section 3: About
+            // Section 3: Account
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("settings_section_account")
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Account",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "Manage your authentication status, log in or register.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Button(
+                        onClick = onNavigateToAccount,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("settings_account_button")
+                            .semantics { contentDescription = "Manage Account" }
+                    ) {
+                        Text("Manage Account")
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Section 4: Jury Promo Access
+            if (juryPromoManager != null) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("settings_section_promo")
+                ) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Jury Promo Access",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(Modifier.height(8.dp))
+
+                        if (isPromoActive) {
+                            Text(
+                                text = "Jury access active (valid through " + (promoValidUntil ?: JuryPromoManager.VALID_UNTIL) + ")",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.testTag("jury_promo_active_badge")
+                            )
+                        } else {
+                            Text(
+                                text = "Enter a jury promo code for temporary full premium access.",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Spacer(Modifier.height(8.dp))
+
+                            OutlinedTextField(
+                                value = promoInput,
+                                onValueChange = { promoInput = it },
+                                label = { Text("Promo Code") },
+                                singleLine = true,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("promo_code_input")
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            Button(
+                                onClick = {
+                                    val result = juryPromoManager.activate(promoInput)
+                                    when (result) {
+                                        is PromoActivationResult.Success -> {
+                                            promoFeedback = "Jury access active through " + result.validUntil
+                                            isPromoError = false
+                                        }
+                                        PromoActivationResult.Expired -> {
+                                            promoFeedback = "Promo code has expired"
+                                            isPromoError = true
+                                        }
+                                        PromoActivationResult.InvalidCode -> {
+                                            promoFeedback = "Invalid promo code"
+                                            isPromoError = true
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("activate_promo_button")
+                            ) {
+                                Text("Activate")
+                            }
+
+                            promoFeedback?.let { feedback ->
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    text = feedback,
+                                    color = if (isPromoError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.testTag("promo_feedback_text")
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+            }
+
+            // Section 5: About
             Card(
                 modifier = Modifier
                     .fillMaxWidth()

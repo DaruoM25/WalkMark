@@ -27,6 +27,7 @@ class JuryPromoSubscriptionManagerTest {
         val manager = JuryPromoSubscriptionManager(base, promo, backgroundScope)
 
         promo.activate("WALKMARK-JURY-2026", date = "2026-10-05")
+        testScheduler.advanceUntilIdle()
 
         assertEquals(SubscriptionStatus.Entitled, manager.subscriptionState.value.status)
         assertTrue(manager.subscriptionState.value.isEntitled)
