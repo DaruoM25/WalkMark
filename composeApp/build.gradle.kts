@@ -29,6 +29,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.play.services.location)
+            implementation(libs.purchases)
             implementation(libs.ktor.client.android)
         }
         commonMain.dependencies {

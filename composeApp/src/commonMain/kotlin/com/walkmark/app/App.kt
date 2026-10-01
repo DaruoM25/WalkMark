@@ -16,7 +16,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,22 +29,30 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.walkmark.app.core.database.createRoomDatabase
 import com.walkmark.app.core.database.getDatabaseBuilder
+import com.walkmark.app.data.auth.supabase.SupabaseAuthConfig
+import com.walkmark.app.data.auth.supabase.SupabaseAuthRepository
 import com.walkmark.app.data.location.DefaultLocationRepository
 import com.walkmark.app.data.media.createLocalMediaStore
 import com.walkmark.app.data.monetization.UnavailableSubscriptionManager
-import com.walkmark.app.data.monetization.WalkRepositoryWalkCount
-import com.walkmark.app.data.walk.RoomWalkRepository
+import com.walkmark.app.data.repository.RoomWalkRepository
+import com.walkmark.app.data.walk.WalkRepositoryWalkCount
 import com.walkmark.app.data.walk.WalkSessionRecorder
+import com.walkmark.app.domain.auth.AuthRepository
 import com.walkmark.app.domain.location.LocationRepository
 import com.walkmark.app.domain.location.rememberLocationTrackerManager
+import com.walkmark.app.domain.monetization.JuryPromoSubscriptionManager
 import com.walkmark.app.domain.monetization.SubscriptionManager
 import com.walkmark.app.domain.monetization.WalkCreationAccessPolicy
+import com.walkmark.app.domain.promo.JuryPromoManager
 import com.walkmark.app.domain.repository.LocalMediaStore
 import com.walkmark.app.domain.repository.WalkRepository
 import com.walkmark.app.domain.walk.StartWalkUseCase
 import com.walkmark.app.domain.walk.WalkStartResult
+import com.walkmark.app.presentation.adaptive.AdaptiveLayout
 import com.walkmark.app.presentation.adaptive.AdaptiveWalkScaffold
 import com.walkmark.app.presentation.adaptive.DevicePosture
+import com.walkmark.app.presentation.auth.AuthScreen
+import com.walkmark.app.presentation.auth.AuthViewModel
 import com.walkmark.app.presentation.journal.WalkDetailScreen
 import com.walkmark.app.presentation.journal.WalkHistoryScreen
 import com.walkmark.app.presentation.journal.deletionNotice
@@ -58,22 +65,20 @@ import com.walkmark.app.presentation.settings.SettingsViewModel
 import com.walkmark.app.presentation.support.SupportContactConfig
 import com.walkmark.app.presentation.support.SupportScreen
 import com.walkmark.app.presentation.theme.WalkMarkTheme
+import com.walkmark.app.presentation.walk.LocalWalkViewModel
 import com.walkmark.app.presentation.walk.WalkViewModel
 import org.jetbrains.compose.resources.stringResource
 import walkmark.composeapp.generated.resources.Res
 import walkmark.composeapp.generated.resources.settings_entry
 import walkmark.composeapp.generated.resources.support_entry
 
-val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
-    error("WalkViewModel not provided")
-}
-
 private enum class RootDestination {
     Main,
     Settings,
     Support,
     History,
-    Detail
+    Detail,
+    Account
 }
 
 @Composable
@@ -83,7 +88,9 @@ fun App(
     mediaStore: LocalMediaStore? = null,
     supportContactConfig: SupportContactConfig = SupportContactConfig.NotConfigured,
     posture: DevicePosture = DevicePosture.Normal,
-    subscriptionManager: SubscriptionManager? = null
+    subscriptionManager: SubscriptionManager? = null,
+    authRepository: AuthRepository? = null,
+    juryPromoManager: JuryPromoManager? = null
 ) {
     WalkMarkTheme {
         Surface(
@@ -106,15 +113,34 @@ fun App(
                 walkRepository ?: RoomWalkRepository(createRoomDatabase(getDatabaseBuilder()), media)
             }
 
-            val subscriptions = remember(subscriptionManager) {
+            val auth = remember(authRepository, scope) {
+                authRepository ?: SupabaseAuthRepository(
+                    config = SupabaseAuthConfig(projectUrl = "", publishableKey = ""),
+                    observationScope = scope
+                )
+            }
+
+            val promo = remember(juryPromoManager) {
+                juryPromoManager ?: JuryPromoManager()
+            }
+
+            val baseSubscriptions = remember(subscriptionManager) {
                 subscriptionManager ?: UnavailableSubscriptionManager()
+            }
+
+            val effectiveSubscriptions = remember(baseSubscriptions, promo, scope) {
+                JuryPromoSubscriptionManager(
+                    base = baseSubscriptions,
+                    promoManager = promo,
+                    scope = scope
+                )
             }
 
             val persistedWalkCount = remember(walks) { WalkRepositoryWalkCount(walks) }
 
-            val startWalk = remember(subscriptions, persistedWalkCount, repository, scope) {
+            val startWalk = remember(effectiveSubscriptions, persistedWalkCount, repository, scope) {
                 StartWalkUseCase(
-                    subscriptionManager = subscriptions,
+                    subscriptionManager = effectiveSubscriptions,
                     walkCount = persistedWalkCount,
                     locationRepository = repository,
                     scope = scope
@@ -150,6 +176,13 @@ fun App(
                 )
             }
 
+            val authViewModel = remember(auth, scope) {
+                AuthViewModel(
+                    authRepository = auth,
+                    scope = scope
+                )
+            }
+
             val viewModel = remember(repository, startWalk) {
                 LocationViewModel(
                     locationRepository = repository,
@@ -159,7 +192,7 @@ fun App(
 
             val startResult by viewModel.startResult.collectAsState()
             val freeWalkCount by viewModel.freeWalkCount.collectAsState()
-            val offerings by subscriptions.offerings.collectAsState()
+            val offerings by effectiveSubscriptions.offerings.collectAsState()
 
             var paywallVisible by remember { mutableStateOf(false) }
             var selectedWalkId by remember { mutableStateOf<String?>(null) }
@@ -201,6 +234,14 @@ fun App(
                                 Text("History")
                             }
                             TextButton(
+                                onClick = { destination = RootDestination.Account },
+                                modifier = Modifier
+                                    .testTag("account_entry_button")
+                                    .semantics { contentDescription = "Account" }
+                            ) {
+                                Text("Account")
+                            }
+                            TextButton(
                                 onClick = { destination = RootDestination.Settings },
                                 modifier = Modifier
                                     .testTag("settings_entry_button")
@@ -220,7 +261,13 @@ fun App(
                     }
                     RootDestination.Settings -> SettingsScreen(
                         viewModel = settingsViewModel,
+                        juryPromoManager = promo,
+                        onNavigateToAccount = { destination = RootDestination.Account },
                         onNavigateToSupport = { destination = RootDestination.Support },
+                        onBack = { destination = RootDestination.Main }
+                    )
+                    RootDestination.Account -> AuthScreen(
+                        viewModel = authViewModel,
                         onBack = { destination = RootDestination.Main }
                     )
                     RootDestination.Support -> SupportScreen(
@@ -255,6 +302,7 @@ fun App(
                         freeWalkCount = freeWalkCount,
                         freeWalkLimit = WalkCreationAccessPolicy.FREE_WALK_LIMIT
                     ),
+                    juryPromoManager = promo,
                     onDismiss = { paywallVisible = false }
                 )
             }
