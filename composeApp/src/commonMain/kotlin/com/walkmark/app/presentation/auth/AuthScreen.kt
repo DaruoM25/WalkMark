@@ -182,6 +182,26 @@ fun AuthScreen(
                         compact = true,
                         modifier = Modifier.testTag("guest_access_status")
                     )
+                    Spacer(Modifier.height(12.dp))
+                }
+
+                // Settings & Support for guest users
+                if (onNavigateToSettings != null) {
+                    AccountActionCard(
+                        title = "Settings",
+                        icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
+                        onClick = onNavigateToSettings,
+                        modifier = Modifier.testTag("settings_entry_button")
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+                if (onNavigateToSupport != null) {
+                    AccountActionCard(
+                        title = "Help & Support",
+                        icon = { Icon(Icons.AutoMirrored.Filled.Help, contentDescription = "Help") },
+                        onClick = onNavigateToSupport,
+                        modifier = Modifier.testTag("support_entry_button")
+                    )
                     Spacer(Modifier.height(16.dp))
                 }
 
@@ -333,26 +353,6 @@ fun AuthScreen(
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
-
-                // Settings & Support for guest users too
-                if (onNavigateToSettings != null) {
-                    AccountActionCard(
-                        title = "Settings",
-                        icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-                        onClick = onNavigateToSettings,
-                        modifier = Modifier.testTag("settings_entry_button")
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-                if (onNavigateToSupport != null) {
-                    AccountActionCard(
-                        title = "Help & Support",
-                        icon = { Icon(Icons.AutoMirrored.Filled.Help, contentDescription = "Help") },
-                        onClick = onNavigateToSupport,
-                        modifier = Modifier.testTag("support_entry_button")
-                    )
-                }
             }
         }
     }
