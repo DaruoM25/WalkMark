@@ -13,4 +13,9 @@ class WalkMigration_2_3_Test {
         assertEquals(2, WalkMarkMigrations.MIGRATION_2_3.startVersion)
         assertEquals(3, WalkMarkMigrations.MIGRATION_2_3.endVersion)
     }
+
+    @Test
+    fun migrationIsIncludedInCanonicalMigrations() {
+        assertTrue(WalkMarkMigrations.ALL_MIGRATIONS.contains(WalkMarkMigrations.MIGRATION_2_3))
+    }
 }
