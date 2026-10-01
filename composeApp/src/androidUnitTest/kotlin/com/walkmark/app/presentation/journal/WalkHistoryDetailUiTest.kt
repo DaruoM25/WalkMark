@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.walkmark.app.data.walk.RecordingWalkRepository
 import com.walkmark.app.domain.location.LocationPoint
 import com.walkmark.app.domain.repository.LocalMediaStore
@@ -70,9 +71,9 @@ class WalkHistoryDetailUiTest {
         var result: WalkDeleteResult? = null
         rule.setContent { WalkMarkTheme { WalkDetailScreen(walk.id, repo, Media, onBack = {}, onDeleted = { result = it }) } }
         rule.onNodeWithTag("walk_route_preview").assertIsDisplayed()
-        rule.onNodeWithTag("detail_note_note-1").assertIsDisplayed()
-        rule.onNodeWithTag("detail_photo_photo-1").assertIsDisplayed()
-        rule.onNodeWithTag("detail_delete_button").performClick()
+        rule.onNodeWithTag("detail_note_note-1").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithTag("detail_photo_photo-1").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithTag("detail_delete_button").performScrollTo().performClick()
         assertEquals(false, repo.deleted)
         rule.onNodeWithTag("detail_confirm_delete").performClick()
         rule.waitUntil(5_000) { repo.deleted && result != null }
