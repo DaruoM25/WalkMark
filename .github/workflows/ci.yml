@@ -83,10 +83,10 @@ jobs:
           try:
               with open('test_log.txt') as f:
                   lines = f.readlines()
-              errs = [l.strip() for l in lines if 'FAILED' in l or 'FAILURE' in l or 'e: ' in l]
+              errs = [l.strip() for l in lines if 'FAILED' in l or 'FAILURE' in l or 'e: ' in l or 'Exception' in l or 'Assertion' in l or 'at com.walkmark' in l]
               if not errs:
                   errs = [l.strip() for l in lines[-40:]]
-              for e in errs[:25]:
+              for e in errs[:35]:
                   msg = e.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
                   print('::error::' + msg)
           except Exception as ex:

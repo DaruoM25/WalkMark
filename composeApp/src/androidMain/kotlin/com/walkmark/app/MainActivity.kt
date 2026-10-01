@@ -11,6 +11,7 @@ import com.walkmark.app.data.monetization.RevenueCatSubscriptionManager
 import com.walkmark.app.data.monetization.UnavailableSubscriptionManager
 import com.walkmark.app.domain.auth.AuthRepository
 import com.walkmark.app.domain.monetization.SubscriptionManager
+import com.walkmark.app.presentation.map.AndroidLiveMap
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +44,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             App(
                 authRepository = authRepository,
-                subscriptionManager = subscriptionManager
+                subscriptionManager = subscriptionManager,
+                mapContent = { state, modifier -> AndroidLiveMap(state, modifier) }
             )
         }
     }

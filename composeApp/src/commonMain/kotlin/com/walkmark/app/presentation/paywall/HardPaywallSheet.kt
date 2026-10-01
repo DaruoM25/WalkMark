@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.walkmark.app.domain.promo.JuryPromoManager
 import com.walkmark.app.domain.promo.PromoActivationResult
@@ -42,26 +46,45 @@ fun HardPaywallSheet(
     AlertDialog(
         modifier = modifier.testTag("paywall_sheet"),
         onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = {
-            Text(
-                text = "Subscription required",
-                modifier = Modifier
-                    .testTag("paywall_title")
-                    .semantics { contentDescription = "Subscription required" }
-            )
+            Column {
+                Text(
+                    text = "WalkMark Premium",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .testTag("paywall_title")
+                        .semantics { contentDescription = "WalkMark Premium" }
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Unlimited walks",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 Text(
-                    text = "You have used your ${state.freeWalkLimit} free walks. " +
-                        "Subscribe to keep recording walks.",
+                    text = "Continue tracking without limits",
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.testTag("paywall_body")
                 )
 
                 if (state.showsStorePrices) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.testTag("paywall_prices")
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("paywall_prices")
                     ) {
                         state.products.forEach { product ->
                             Row(
@@ -70,9 +93,13 @@ fun HardPaywallSheet(
                                     .testTag("paywall_price_${product.id}"),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "${product.title} (${product.period})")
+                                Text(
+                                    text = "${product.title} (${product.period})",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                                 Text(
                                     text = product.priceFormatted,
+                                    fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.testTag("paywall_price_value_${product.id}")
                                 )
                             }
@@ -82,6 +109,7 @@ fun HardPaywallSheet(
                     Text(
                         text = "Purchases are not available in this build.",
                         style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .testTag("paywall_provider_unavailable")
                             .semantics { contentDescription = "Purchases are not available in this build" }
@@ -89,10 +117,11 @@ fun HardPaywallSheet(
                 }
 
                 if (juryPromoManager != null) {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Have a Jury Promo Code?",
-                        style = MaterialTheme.typography.titleSmall
+                        text = "Enter jury access code",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
                     )
                     OutlinedTextField(
                         value = promoInput,
@@ -123,7 +152,10 @@ fun HardPaywallSheet(
                                 }
                             }
                         },
-                        modifier = Modifier.fillMaxWidth().testTag("paywall_promo_activate_button")
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("paywall_promo_activate_button"),
+                        shape = MaterialTheme.shapes.medium
                     ) {
                         Text("Apply Promo Code")
                     }
@@ -133,6 +165,7 @@ fun HardPaywallSheet(
                     Text(
                         text = message,
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.testTag("paywall_provider_status")
                     )
                 }
@@ -143,17 +176,19 @@ fun HardPaywallSheet(
                 Button(
                     onClick = { },
                     enabled = false,
-                    modifier = Modifier.testTag("paywall_purchase_button")
+                    modifier = Modifier.testTag("paywall_purchase_button"),
+                    shape = MaterialTheme.shapes.medium
                 ) {
-                    Text(text = "Subscribe")
+                    Text("Upgrade to Premium", fontWeight = FontWeight.Bold)
                 }
             } else {
-                TextButton(
+                OutlinedButton(
                     onClick = { },
                     enabled = false,
-                    modifier = Modifier.testTag("paywall_purchase_button")
+                    modifier = Modifier.testTag("paywall_purchase_button"),
+                    shape = MaterialTheme.shapes.medium
                 ) {
-                    Text(text = "Purchases unavailable in this build")
+                    Text("Purchases unavailable in this build")
                 }
             }
         },
@@ -164,7 +199,7 @@ fun HardPaywallSheet(
             ) {
                 TextButton(
                     onClick = { },
-                    enabled = false,
+                    enabled = state.hasEnabledRestoreControl(),
                     modifier = Modifier
                         .testTag("paywall_restore_button")
                         .semantics { contentDescription = "Restore purchases" }
@@ -183,7 +218,7 @@ fun HardPaywallSheet(
                         .testTag("paywall_close_button")
                         .semantics { contentDescription = "Close" }
                 ) {
-                    Text(text = "Close")
+                    Text("Close")
                 }
             }
         }
