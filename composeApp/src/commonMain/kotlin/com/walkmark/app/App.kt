@@ -1,6 +1,7 @@
 ﻿package com.walkmark.app
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -46,6 +47,9 @@ import com.walkmark.app.domain.walk.WalkStartResult
 import com.walkmark.app.presentation.adaptive.AdaptiveWalkScaffold
 import com.walkmark.app.presentation.adaptive.DevicePosture
 import com.walkmark.app.presentation.journal.JournalScreen
+import com.walkmark.app.presentation.journal.WalkDetailScreen
+import com.walkmark.app.presentation.journal.WalkHistoryScreen
+import com.walkmark.app.presentation.journal.deletionNotice
 import com.walkmark.app.presentation.location.LocationViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
 import com.walkmark.app.presentation.paywall.HardPaywallSheet
@@ -64,7 +68,9 @@ val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
 
 private enum class RootDestination {
     Main,
-    Support
+    Support,
+    History,
+    Detail
 }
 
 @Composable
@@ -92,10 +98,10 @@ fun App(
                 )
             }
 
-            val walks = remember(walkRepository) {
-                walkRepository ?: RoomWalkRepository(createRoomDatabase(getDatabaseBuilder()))
-            }
             val media = remember { mediaStore ?: createLocalMediaStore() }
+            val walks = remember(walkRepository, media) {
+                walkRepository ?: RoomWalkRepository(createRoomDatabase(getDatabaseBuilder()), media)
+            }
 
             val subscriptions = remember(subscriptionManager) {
                 subscriptionManager ?: UnavailableSubscriptionManager()
@@ -154,6 +160,8 @@ fun App(
                 }
             }
             var destination by remember { mutableStateOf(RootDestination.Main) }
+            var selectedWalkId by remember { mutableStateOf<String?>(null) }
+            var historyNotice by remember { mutableStateOf<String?>(null) }
 
             CompositionLocalProvider(LocalWalkViewModel provides walkViewModel) {
                 when (destination) {
@@ -164,25 +172,51 @@ fun App(
                                 TrackingScreen(viewModel = viewModel)
                             },
                             secondaryContent = { _ ->
-                                JournalScreen()
+                                WalkHistoryScreen(
+                                    repository = walks,
+                                    onOpenWalk = { selectedWalkId = it; destination = RootDestination.Detail }
+                                )
                             }
                         )
-                        TextButton(
-                            onClick = { destination = RootDestination.Support },
+                        Row(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .windowInsetsPadding(WindowInsets.safeDrawing)
                                 .padding(8.dp)
-                                .testTag("support_entry_button")
-                                .semantics { contentDescription = "Help and Support" }
                         ) {
-                            Text(stringResource(Res.string.support_entry))
+                            TextButton(
+                                onClick = { historyNotice = null; destination = RootDestination.History },
+                                modifier = Modifier.testTag("history_entry_button")
+                            ) { Text("History") }
+                            TextButton(
+                                onClick = { destination = RootDestination.Support },
+                                modifier = Modifier.testTag("support_entry_button")
+                                    .semantics { contentDescription = "Help and Support" }
+                            ) { Text(stringResource(Res.string.support_entry)) }
                         }
                     }
                     RootDestination.Support -> SupportScreen(
                         contactConfig = supportContactConfig,
                         onBack = { destination = RootDestination.Main }
                     )
+                    RootDestination.History -> WalkHistoryScreen(
+                        repository = walks,
+                        onOpenWalk = { selectedWalkId = it; destination = RootDestination.Detail },
+                        onBack = { destination = RootDestination.Main },
+                        notice = historyNotice
+                    )
+                    RootDestination.Detail -> selectedWalkId?.let { walkId ->
+                        WalkDetailScreen(
+                            walkId = walkId,
+                            repository = walks,
+                            mediaStore = media,
+                            onBack = { destination = RootDestination.History },
+                            onDeleted = { result ->
+                                historyNotice = deletionNotice(result)
+                                destination = RootDestination.History
+                            }
+                        )
+                    }
                 }
             }
 
