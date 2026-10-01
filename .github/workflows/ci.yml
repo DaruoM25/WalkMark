@@ -44,17 +44,28 @@ jobs:
         run: chmod +x gradlew
 
       - name: 1. Compile Android Debug
-        run: ./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon --stacktrace
+        run: |
+          set +e
+          ./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon --stacktrace > compile_log.txt 2>&1
+          EXIT_CODE=$?
+          echo "## Compile Log (Exit code: $EXIT_CODE)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat compile_log.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat compile_log.txt
+          exit $EXIT_CODE
 
       - name: 2. Run Android Unit Tests
-        run: ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: composeApp/build/reports/tests/testDebugUnitTest/
+        run: |
+          set +e
+          ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace > test_log.txt 2>&1
+          EXIT_CODE=$?
+          echo "## Test Log (Exit code: $EXIT_CODE)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat test_log.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat test_log.txt
+          exit $EXIT_CODE
 
       - name: 3. Assemble Android Debug APK
         run: ./gradlew :composeApp:assembleDebug --no-daemon --stacktrace
