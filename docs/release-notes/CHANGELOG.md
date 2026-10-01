@@ -4,6 +4,75 @@ All notable changes to WalkMark will be documented in this file.
 
 # [Unreleased]
 ### Added - [IMPLEMENTED]
+- **US-011: Local Walk GPX Export**:
+  - Provider-neutral `GpxDocumentGenerator` in `commonMain` producing valid UTF-8 **GPX 1.1**
+    (`version="1.1"`, `creator="WalkMark"`, `http://www.topografix.com/GPX/1/1` namespace plus
+    `xsi:schemaLocation`) with `<metadata>`, one `<trk>`/`<trkseg>`, and one `<trkpt>` per
+    persisted point.
+  - Read-only `ExportWalkUseCase` built on the existing `WalkRepository.getWalk()` and
+    `observePoints().first()`. Point order is the persisted `ORDER BY seq ASC` sequence and is
+    never re-sorted.
+  - **No manufactured data.** `<ele>` is emitted only when the persisted point carries altitude;
+    a missing altitude is never converted to `0`. `<time>` is emitted only for a timestamp
+    greater than zero, formatted as locale-independent UTC ISO-8601 (`yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`).
+    Unavailable source data causes the element to be omitted.
+  - Text values are XML-escaped for `& < > " '`. Numeric latitude/longitude are serialised with
+    locale-independent `Double.toString`, never XML-escaped, so no decimal-comma defect can occur.
+  - Deterministic filename `walkmark-<sanitized-title>-<walk-id>.gpx`, degrading to
+    `walkmark-<walk-id>.gpx`. Both segments use an `[A-Za-z0-9-_]` allow-list with bounded length,
+    so a walk title can never produce a path separator or a `..` traversal segment.
+  - New lightweight **Saved Walks** destination (`RootDestination.SavedWalks`) listing completed
+    walks with a per-walk `Export / Share GPX` action, reached from the main screen.
+  - `SavedWalksViewModel` is platform-neutral: it depends only on `WalkRepository`,
+    `ExportWalkUseCase`, and the provider-neutral `GpxShareLauncher` interface, and holds no
+    `Context`, `Intent`, `Uri`, `NSURL`, or filesystem path. `WalkExportState` is
+    `Idle / Exporting / Success / Error`, with an `InProgress` re-entrancy guard that suppresses
+    duplicate export requests. `Error` carries a closed enum reason, never an exception message.
+  - `GpxShareLauncher` expect/actual following the existing `SupportContactLauncher` pattern.
+    Android writes to the **app-private cache only** (`walkmark-gpx/`), shares via
+    `androidx.core.content.FileProvider` + `ACTION_SEND` + `application/gpx+xml` +
+    `FLAG_GRANT_READ_URI_PERMISSION`, and adds **no storage permission**.
+    iOS writes to `NSTemporaryDirectory()` and presents `UIActivityViewController`.
+  - `ACCOUNT_REQUIRED = NO`, `NETWORK_REQUIRED = NO`: export reads only already-persisted local data.
+
+  Scope boundaries honoured:
+  - Room schema **unchanged** (still version 2); no migration, no entity, DAO, or mapper change.
+  - `WalkRepository.kt` **unchanged** (high-conflict registry file).
+  - Walk data is **read only**: `Walk`, `walk_points`, identifiers, and media paths are never mutated.
+  - No new dependency. `androidx.core.content.FileProvider` resolves transitively through the
+    existing `androidx.activity:activity-compose`; `libs.versions.toml` is unchanged.
+  - Out of scope and not implemented: GPX import, cloud backup, sync, bulk export, ZIP archive,
+    photo export, note export, background export, scheduled backup.
+  - `App.kt` change limited to the new destination plus a `Row` wrapping the existing
+    `support_entry_button`, whose testTag and behaviour are preserved.
+
+  Verification status (partial - verification debt OPEN):
+  - `:composeApp:compileDebugKotlinAndroid` **PASS** on the `c53c8d8` baseline and **PASS** after
+    the change. This confirms `androidx.core.content.FileProvider` resolves through the existing
+    `androidx.activity:activity-compose` graph with **no new dependency**, and that `App.kt`,
+    the new resources, and the Android actual all compile.
+  - `:composeApp:testDebugUnitTest` **NOT PASSING / NOT VERIFIED**. The first run failed at
+    `:composeApp:compileDebugUnitTestKotlinAndroid` because a test helper returned the
+    `CoroutineScope` interface instead of `TestScope`, so `advanceUntilIdle()` was unresolved.
+    That defect and a `WhileSubscribed` subscription bug in the walk-list test were corrected
+    **statically**; the suite has **not** been re-run, so no test pass is claimed.
+  - `:composeApp:assembleDebug` **NOT RUN**. The `FileProvider` provider declaration and
+    `res/xml/file_paths.xml` linkage are therefore statically audited but **not** proven by a
+    successful build.
+  - New test suites awaiting execution: `GpxDocumentGeneratorTest` (13),
+    `ExportWalkUseCaseTest` (8), `SavedWalksViewModelTest` (8), `GpxShareLauncherTest` (1).
+
+  Not verified / deferred:
+  - iOS actual compilation and runtime: **NOT VERIFIED ON WINDOWS** (`ENVIRONMENT_BLOCKED` /
+    `MACOS_XCODE_REQUIRED`). No iOS PASS is claimed.
+  - Android instrumentation runtime: **NOT VERIFIED** (no emulator run in this pass).
+  - Branch is based on `c53c8d8`. `origin/main` advanced to `023d1cd` after the branch was
+    created; that commit touches only two `androidUnitTest` support files and does not overlap
+    US-011, but the branch is one commit behind `main` and has not been rebased or merged.
+
+  Docs: `docs/user-guide/export-gpx.md`, `docs/user-guide/walk-history.md`.
+
+### Added - [IMPLEMENTED]
 - **US-007: In-App User Support**:
   - Dedicated local Help & Support destination with approved FAQ and troubleshooting topics.
   - Privacy-preserving, user-initiated email contact through Android and iOS platform launchers.
