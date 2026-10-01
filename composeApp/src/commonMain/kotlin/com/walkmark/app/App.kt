@@ -29,8 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.walkmark.app.core.database.createRoomDatabase
 import com.walkmark.app.core.database.getDatabaseBuilder
-import com.walkmark.app.data.auth.supabase.SupabaseAuthConfig
-import com.walkmark.app.data.auth.supabase.SupabaseAuthRepository
+import com.walkmark.app.data.auth.UnavailableAuthRepository
 import com.walkmark.app.data.location.DefaultLocationRepository
 import com.walkmark.app.data.media.createLocalMediaStore
 import com.walkmark.app.data.monetization.UnavailableSubscriptionManager
@@ -113,11 +112,8 @@ fun App(
                 walkRepository ?: RoomWalkRepository(createRoomDatabase(getDatabaseBuilder()), media)
             }
 
-            val auth = remember(authRepository, scope) {
-                authRepository ?: SupabaseAuthRepository(
-                    config = SupabaseAuthConfig(projectUrl = "", publishableKey = ""),
-                    observationScope = scope
-                )
+            val auth = remember(authRepository) {
+                authRepository ?: UnavailableAuthRepository()
             }
 
             val promo = remember(juryPromoManager) {
