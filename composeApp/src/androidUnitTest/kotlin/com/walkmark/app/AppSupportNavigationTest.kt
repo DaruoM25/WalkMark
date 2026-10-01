@@ -67,6 +67,7 @@ class AppSupportNavigationTest {
         }
 
         composeTestRule.onNodeWithTag("stop_walk_button").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("nav_account").assertIsDisplayed().performClick()
         composeTestRule.onNodeWithTag("settings_entry_button").assertIsDisplayed().performClick()
         composeTestRule.onNodeWithTag("settings_screen").assertIsDisplayed()
         composeTestRule.onNodeWithTag("settings_support_button").assertIsDisplayed().performClick()
@@ -74,6 +75,7 @@ class AppSupportNavigationTest {
         composeTestRule.onNodeWithTag("support_back_button").performClick()
         composeTestRule.onNodeWithTag("settings_screen").assertIsDisplayed()
         composeTestRule.onNodeWithTag("settings_back_button").performClick()
+        composeTestRule.onNodeWithTag("nav_home").assertIsDisplayed().performClick()
         composeTestRule.onNodeWithTag("stop_walk_button").assertIsDisplayed()
     }
 }

@@ -341,7 +341,7 @@ fun AuthScreen(
                         title = "Settings",
                         icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
                         onClick = onNavigateToSettings,
-                        modifier = Modifier.testTag("guest_settings_button")
+                        modifier = Modifier.testTag("settings_entry_button")
                     )
                     Spacer(Modifier.height(8.dp))
                 }
@@ -350,7 +350,7 @@ fun AuthScreen(
                         title = "Help & Support",
                         icon = { Icon(Icons.AutoMirrored.Filled.Help, contentDescription = "Help") },
                         onClick = onNavigateToSupport,
-                        modifier = Modifier.testTag("guest_support_button")
+                        modifier = Modifier.testTag("support_entry_button")
                     )
                 }
             }
