@@ -1,4 +1,4 @@
-﻿package com.walkmark.app
+package com.walkmark.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

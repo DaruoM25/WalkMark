@@ -1,4 +1,4 @@
-﻿package com.walkmark.app.presentation.journal
+package com.walkmark.app.presentation.journal
 
 import app.cash.turbine.test
 import com.walkmark.app.core.model.SampleItem

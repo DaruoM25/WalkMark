@@ -1,4 +1,4 @@
-﻿package com.walkmark.app.presentation.theme
+package com.walkmark.app.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

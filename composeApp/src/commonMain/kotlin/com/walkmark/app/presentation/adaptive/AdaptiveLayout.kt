@@ -1,4 +1,4 @@
-﻿package com.walkmark.app.presentation.adaptive
+package com.walkmark.app.presentation.adaptive
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp

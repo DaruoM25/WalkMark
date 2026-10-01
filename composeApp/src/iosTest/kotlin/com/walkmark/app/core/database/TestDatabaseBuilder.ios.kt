@@ -1,4 +1,4 @@
-﻿package com.walkmark.app.core.database
+package com.walkmark.app.core.database
 
 import androidx.room.Room
 import androidx.room.RoomDatabase

@@ -1,4 +1,4 @@
-﻿package com.walkmark.app
+package com.walkmark.app
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals

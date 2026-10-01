@@ -44,32 +44,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: 1. Compile Android Debug
-        run: |
-          set +e
-          ./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon --stacktrace > compile_log.txt 2>&1
-          EXIT_CODE=$?
-          python3 -c "
-          with open('compile_log.txt') as f:
-              for line in f:
-                  if 'e: ' in line or 'ERROR' in line or 'Unresolved' in line:
-                      print(f'::error::{line.strip()}')
-          "
-          cat compile_log.txt
-          exit $EXIT_CODE
+        run: ./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon --stacktrace
 
       - name: 2. Run Android Unit Tests
-        run: |
-          set +e
-          ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace > test_log.txt 2>&1
-          EXIT_CODE=$?
-          python3 -c "
-          with open('test_log.txt') as f:
-              for line in f:
-                  if 'FAILED' in line or 'FAILURE' in line or 'ERROR' in line or 'e: ' in line:
-                      print(f'::error::{line.strip()}')
-          "
-          cat test_log.txt
-          exit $EXIT_CODE
+        run: ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace
 
       - name: 3. Assemble Android Debug APK
         run: ./gradlew :composeApp:assembleDebug --no-daemon --stacktrace

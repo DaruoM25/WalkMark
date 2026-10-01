@@ -1,4 +1,4 @@
-﻿package com.walkmark.app.core.database
+package com.walkmark.app.core.database
 
 import com.walkmark.app.core.database.entity.SampleEntity
 import com.walkmark.app.core.model.SampleItem

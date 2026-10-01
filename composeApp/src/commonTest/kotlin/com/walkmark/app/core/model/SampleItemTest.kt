@@ -1,4 +1,4 @@
-﻿package com.walkmark.app.core.model
+package com.walkmark.app.core.model
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
