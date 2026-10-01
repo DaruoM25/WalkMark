@@ -23,8 +23,10 @@ class SupportContactLauncherTest {
 
         assertEquals(Intent.ACTION_SENDTO, intent.action)
         assertEquals("mailto", intent.data?.scheme)
-        assertEquals("support+mobile@example.com", intent.data?.schemeSpecificPart?.substringBefore('?'))
-        val encodedQuery = intent.data?.schemeSpecificPart?.substringAfter('?').orEmpty()
+        val schemeSpecific = intent.data?.encodedSchemeSpecificPart.orEmpty()
+        val recipient = Uri.decode(schemeSpecific.substringBefore('?'))
+        assertEquals("support+mobile@example.com", recipient)
+        val encodedQuery = schemeSpecific.substringAfter('?')
         val parameters = encodedQuery.split('&').associate { parameter ->
             val (name, value) = parameter.split('=', limit = 2)
             name to Uri.decode(value)

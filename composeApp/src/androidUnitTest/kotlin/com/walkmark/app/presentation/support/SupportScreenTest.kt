@@ -8,6 +8,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.walkmark.app.presentation.theme.WalkMarkTheme
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.PreviewContextConfigurationEffect
@@ -48,8 +49,8 @@ class SupportScreenTest {
         composeTestRule.onNodeWithTag("support_screen").assertIsDisplayed()
         composeTestRule.onNodeWithTag("support_privacy_notice").assertIsDisplayed()
         supportFaqItems.forEach { composeTestRule.onNodeWithTag("support_faq_${it.id}").fetchSemanticsNode() }
-        composeTestRule.onNodeWithTag("support_contact_button").assertIsNotEnabled()
-        composeTestRule.onNodeWithTag("support_contact_not_configured").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("support_contact_button").performScrollTo().assertIsNotEnabled()
+        composeTestRule.onNodeWithTag("support_contact_not_configured").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -64,8 +65,8 @@ class SupportScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithTag("support_contact_button").assertIsEnabled().performClick()
+        composeTestRule.onNodeWithTag("support_contact_button").performScrollTo().assertIsEnabled().performClick()
         check(launcher.request?.recipient == "support@example.com")
-        composeTestRule.onNodeWithTag("support_contact_error").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("support_contact_error").performScrollTo().assertIsDisplayed()
     }
 }
