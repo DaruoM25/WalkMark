@@ -44,10 +44,50 @@ jobs:
         run: chmod +x gradlew
 
       - name: 1. Compile Android Debug
-        run: ./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon --stacktrace
+        id: compile
+        run: |
+          set -o pipefail
+          ./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon --stacktrace 2>&1 | tee compile_log.txt
+
+      - name: Emit Compile Diagnostics
+        if: failure()
+        run: |
+          python3 -c "
+          import sys
+          try:
+              with open('compile_log.txt') as f:
+                  lines = f.readlines()
+              errs = [l.strip() for l in lines if 'e: ' in l or 'error:' in l.lower() or 'unresolved' in l.lower() or 'none of the following' in l.lower() or 'cannot find' in l.lower()]
+              if not errs:
+                  errs = [l.strip() for l in lines[-40:]]
+              for e in errs[:25]:
+                  msg = e.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+                  print('::error::' + msg)
+          except Exception as ex:
+              print('::error::Logger failed: ' + str(ex))
+          "
 
       - name: 2. Run Android Unit Tests
-        run: ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace 2>&1 | tee test_log.txt
+
+      - name: Emit Test Diagnostics
+        if: failure()
+        run: |
+          python3 -c "
+          try:
+              with open('test_log.txt') as f:
+                  lines = f.readlines()
+              errs = [l.strip() for l in lines if 'FAILED' in l or 'FAILURE' in l or 'e: ' in l]
+              if not errs:
+                  errs = [l.strip() for l in lines[-40:]]
+              for e in errs[:25]:
+                  msg = e.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+                  print('::error::' + msg)
+          except Exception as ex:
+              print('::error::Logger failed: ' + str(ex))
+          "
 
       - name: 3. Assemble Android Debug APK
         run: ./gradlew :composeApp:assembleDebug --no-daemon --stacktrace
