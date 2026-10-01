@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -135,38 +135,41 @@ fun WalkDetailContent(
             WalkDetailState.Loading -> Text("Loading walk…", modifier = Modifier.testTag("detail_loading"))
             WalkDetailState.NotFound -> Text("Walk not found.", modifier = Modifier.testTag("detail_not_found"))
             WalkDetailState.Error -> Text("Walk details could not be loaded.", modifier = Modifier.testTag("detail_error"))
-            is WalkDetailState.Ready -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                item {
-                    Text(state.walk.title.takeIf { it.isNotBlank() } ?: "Walk", style = MaterialTheme.typography.headlineMedium)
-                    Text(formatWalkDateTime(state.walk.startTimeEpochMs))
-                    Text(formatWalkDistance(state.walk.totalDistanceMeters))
-                    if (state.walk.status == WalkStatus.COMPLETED) Text(formatWalkDuration(state.walk.durationSeconds))
-                    else Text("In progress")
-                    state.walk.summary?.takeIf { it.isNotBlank() }?.let { Text(it) }
+            is WalkDetailState.Ready -> Column(
+                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(state.walk.title.takeIf { it.isNotBlank() } ?: "Walk", style = MaterialTheme.typography.headlineMedium)
+                Text(formatWalkDateTime(state.walk.startTimeEpochMs))
+                Text(formatWalkDistance(state.walk.totalDistanceMeters))
+                if (state.walk.status == WalkStatus.COMPLETED) Text(formatWalkDuration(state.walk.durationSeconds))
+                else Text("In progress")
+                state.walk.summary?.takeIf { it.isNotBlank() }?.let { Text(it) }
+
+                Text("Route", style = MaterialTheme.typography.titleMedium)
+                if (state.points.isEmpty()) Text("No route points saved.")
+                else WalkRoutePreview(state.points.toMapRouteUiModel())
+
+                Text("Notes", style = MaterialTheme.typography.titleMedium)
+                if (state.notes.isEmpty()) Text("No notes saved.")
+                state.notes.forEach { note ->
+                    Card(Modifier.fillMaxWidth()) {
+                        Text(note.text, Modifier.padding(12.dp).testTag("detail_note_${note.id}"))
+                    }
                 }
-                item {
-                    Text("Route", style = MaterialTheme.typography.titleMedium)
-                    if (state.points.isEmpty()) Text("No route points saved.")
-                    else WalkRoutePreview(state.points.toMapRouteUiModel())
-                }
-                item { Text("Notes", style = MaterialTheme.typography.titleMedium) }
-                if (state.notes.isEmpty()) item { Text("No notes saved.") }
-                items(state.notes, key = { it.id }) { note -> Card(Modifier.fillMaxWidth()) {
-                    Text(note.text, Modifier.padding(12.dp).testTag("detail_note_${note.id}"))
-                } }
-                item { Text("Photos", style = MaterialTheme.typography.titleMedium) }
-                if (state.photos.isEmpty()) item { Text("No photos saved.") }
-                items(state.photos, key = { it.id }) { photo ->
+
+                Text("Photos", style = MaterialTheme.typography.titleMedium)
+                if (state.photos.isEmpty()) Text("No photos saved.")
+                state.photos.forEach { photo ->
                     SavedPhotoThumbnail(
                         absolutePath = mediaStore.absolutePath(photo.relativePath),
                         modifier = Modifier.fillMaxWidth().height(180.dp).testTag("detail_photo_${photo.id}")
                     )
                 }
-                item {
-                    if (deleteError) Text("Walk could not be deleted.", modifier = Modifier.testTag("detail_delete_error"))
-                    Button(onClick = onDelete, enabled = !deleting, modifier = Modifier.testTag("detail_delete_button")) {
-                        Text(if (deleting) "Deleting…" else "Delete walk")
-                    }
+
+                if (deleteError) Text("Walk could not be deleted.", modifier = Modifier.testTag("detail_delete_error"))
+                Button(onClick = onDelete, enabled = !deleting, modifier = Modifier.testTag("detail_delete_button")) {
+                    Text(if (deleting) "Deleting…" else "Delete walk")
                 }
             }
         }
