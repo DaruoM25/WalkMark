@@ -46,9 +46,9 @@ import com.walkmark.app.domain.walk.StartWalkUseCase
 import com.walkmark.app.domain.walk.WalkStartResult
 import com.walkmark.app.presentation.adaptive.AdaptiveWalkScaffold
 import com.walkmark.app.presentation.adaptive.DevicePosture
-import com.walkmark.app.presentation.journal.DeleteWalkResult
 import com.walkmark.app.presentation.journal.WalkDetailScreen
 import com.walkmark.app.presentation.journal.WalkHistoryScreen
+import com.walkmark.app.presentation.journal.deletionNotice
 import com.walkmark.app.presentation.location.LocationViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
 import com.walkmark.app.presentation.paywall.HardPaywallSheet
@@ -76,12 +76,6 @@ private enum class RootDestination {
     Detail
 }
 
-private fun deletionNotice(result: DeleteWalkResult): String = when (result) {
-    DeleteWalkResult.Deleted -> "Walk deleted"
-    DeleteWalkResult.DeletedWithMediaWarning -> "Walk deleted (some photos could not be removed)"
-    DeleteWalkResult.Failed -> "Failed to delete walk"
-}
-
 @Composable
 fun App(
     locationRepository: LocationRepository? = null,
@@ -107,10 +101,10 @@ fun App(
                 )
             }
 
-            val walks = remember(walkRepository) {
-                walkRepository ?: RoomWalkRepository(createRoomDatabase(getDatabaseBuilder()))
-            }
             val media = remember { mediaStore ?: createLocalMediaStore() }
+            val walks = remember(walkRepository, media) {
+                walkRepository ?: RoomWalkRepository(createRoomDatabase(getDatabaseBuilder()), media)
+            }
 
             val subscriptions = remember(subscriptionManager) {
                 subscriptionManager ?: UnavailableSubscriptionManager()
