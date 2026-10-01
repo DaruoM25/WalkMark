@@ -16,6 +16,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,10 +52,8 @@ import com.walkmark.app.presentation.adaptive.AdaptiveWalkScaffold
 import com.walkmark.app.presentation.adaptive.DevicePosture
 import com.walkmark.app.presentation.auth.AuthScreen
 import com.walkmark.app.presentation.auth.AuthViewModel
-import com.walkmark.app.presentation.journal.LocalWalkViewModel
 import com.walkmark.app.presentation.journal.WalkDetailScreen
 import com.walkmark.app.presentation.journal.WalkHistoryScreen
-import com.walkmark.app.presentation.journal.WalkViewModel
 import com.walkmark.app.presentation.journal.deletionNotice
 import com.walkmark.app.presentation.location.LocationViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
@@ -65,10 +64,15 @@ import com.walkmark.app.presentation.settings.SettingsViewModel
 import com.walkmark.app.presentation.support.SupportContactConfig
 import com.walkmark.app.presentation.support.SupportScreen
 import com.walkmark.app.presentation.theme.WalkMarkTheme
+import com.walkmark.app.presentation.walk.WalkViewModel
 import org.jetbrains.compose.resources.stringResource
 import walkmark.composeapp.generated.resources.Res
 import walkmark.composeapp.generated.resources.settings_entry
 import walkmark.composeapp.generated.resources.support_entry
+
+val LocalWalkViewModel = compositionLocalOf<WalkViewModel> {
+    error("WalkViewModel not provided")
+}
 
 private enum class RootDestination {
     Main,
@@ -84,11 +88,11 @@ fun App(
     locationRepository: LocationRepository? = null,
     walkRepository: WalkRepository? = null,
     mediaStore: LocalMediaStore? = null,
-    authRepository: AuthRepository? = null,
-    subscriptionManager: SubscriptionManager? = null,
-    juryPromoManager: JuryPromoManager? = null,
     supportContactConfig: SupportContactConfig = SupportContactConfig.NotConfigured,
-    posture: DevicePosture = DevicePosture.Normal
+    posture: DevicePosture = DevicePosture.Normal,
+    subscriptionManager: SubscriptionManager? = null,
+    authRepository: AuthRepository? = null,
+    juryPromoManager: JuryPromoManager? = null
 ) {
     WalkMarkTheme {
         Surface(
@@ -123,12 +127,8 @@ fun App(
                 subscriptionManager ?: UnavailableSubscriptionManager()
             }
 
-            val effectiveSubscriptions = remember(baseSubscriptions, promo, scope) {
-                JuryPromoSubscriptionManager(
-                    base = baseSubscriptions,
-                    promoManager = promo,
-                    scope = scope
-                )
+            val effectiveSubscriptions = remember(baseSubscriptions, promo) {
+                JuryPromoSubscriptionManager(baseSubscriptions, promo)
             }
 
             val persistedWalkCount = remember(walks) { WalkRepositoryWalkCount(walks) }
