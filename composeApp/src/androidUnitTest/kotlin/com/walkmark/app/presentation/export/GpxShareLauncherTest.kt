@@ -18,7 +18,7 @@ class GpxShareLauncherTest {
 
         assertEquals(Intent.ACTION_SEND, intent.action)
         assertEquals(GPX_MIME_TYPE, intent.type)
-        assertEquals(uri, intent.getParcelableExtra(Intent.EXTRA_STREAM))
+        assertEquals(uri, intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java))
         assertEquals("walkmark-test.gpx", intent.getStringExtra(Intent.EXTRA_SUBJECT))
         assertEquals(
             Intent.FLAG_GRANT_READ_URI_PERMISSION,
