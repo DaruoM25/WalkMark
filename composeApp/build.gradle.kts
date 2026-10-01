@@ -30,6 +30,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.play.services.location)
             implementation(libs.maplibre.android)
+            implementation(libs.okhttp)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
