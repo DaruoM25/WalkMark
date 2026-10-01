@@ -168,7 +168,7 @@ class GpxDocumentGeneratorTest {
 
     @Test
     fun utcTimestampConversionHandlesLeapDayAndEpochBoundaries() {
-        assertEquals("1970-01-01T00:00:00.000Z", GpxDocumentGenerator.toUtcTimestamp(0L + 1L))
+        assertEquals("1970-01-01T00:00:00.001Z", GpxDocumentGenerator.toUtcTimestamp(1L))
         assertEquals("2020-02-29T12:00:00.000Z", GpxDocumentGenerator.toUtcTimestamp(1_582_977_600_000L))
         assertEquals("2000-02-29T00:00:00.000Z", GpxDocumentGenerator.toUtcTimestamp(951_782_400_000L))
         assertEquals("2023-12-31T23:59:59.999Z", GpxDocumentGenerator.toUtcTimestamp(1_704_067_199_999L))
