@@ -7,6 +7,7 @@ object WalkMarkMigrations {
 
     const val VERSION_1 = 1
     const val VERSION_2 = 2
+    const val VERSION_3 = 3
 
     val MIGRATION_1_2 = object : Migration(VERSION_1, VERSION_2) {
         override fun migrate(connection: SQLiteConnection) {
@@ -82,6 +83,35 @@ object WalkMarkMigrations {
             )
             connection.execute(
                 "CREATE INDEX IF NOT EXISTS `index_walk_photos_walkId` ON `walk_photos` (`walkId`)"
+            )
+        }
+    }
+
+    val MIGRATION_2_3 = object : Migration(VERSION_2, VERSION_3) {
+        override fun migrate(connection: SQLiteConnection) {
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS `sync_operations` (
+                    `operationId` TEXT NOT NULL,
+                    `entityType` TEXT NOT NULL,
+                    `entityId` TEXT NOT NULL,
+                    `walkId` TEXT,
+                    `operationType` TEXT NOT NULL,
+                    `createdAtEpochMs` INTEGER NOT NULL,
+                    `attemptCount` INTEGER NOT NULL DEFAULT 0,
+                    `lastAttemptEpochMs` INTEGER,
+                    PRIMARY KEY(`operationId`)
+                )
+                """.trimIndent()
+            )
+            connection.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS `index_sync_operations_entity_unique` ON `sync_operations` (`entityType`, `entityId`)"
+            )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS `index_sync_operations_walkId` ON `sync_operations` (`walkId`)"
+            )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS `index_sync_operations_order` ON `sync_operations` (`createdAtEpochMs`, `operationId`)"
             )
         }
     }

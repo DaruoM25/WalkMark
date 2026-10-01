@@ -1,15 +1,17 @@
-﻿package com.walkmark.app.core.database
+package com.walkmark.app.core.database
 
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import com.walkmark.app.core.database.dao.SampleDao
+import com.walkmark.app.core.database.dao.SyncOperationDao
 import com.walkmark.app.core.database.dao.WalkDao
 import com.walkmark.app.core.database.dao.WalkNoteDao
 import com.walkmark.app.core.database.dao.WalkPhotoDao
 import com.walkmark.app.core.database.dao.WalkPointDao
 import com.walkmark.app.core.database.entity.SampleEntity
+import com.walkmark.app.core.database.entity.SyncOperationEntity
 import com.walkmark.app.core.database.entity.WalkEntity
 import com.walkmark.app.core.database.entity.WalkNoteEntity
 import com.walkmark.app.core.database.entity.WalkPhotoEntity
@@ -32,9 +34,10 @@ import com.walkmark.app.core.database.entity.WalkPointEntity
         WalkEntity::class,
         WalkPointEntity::class,
         WalkNoteEntity::class,
-        WalkPhotoEntity::class
+        WalkPhotoEntity::class,
+        SyncOperationEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @ConstructedBy(WalkMarkDatabaseConstructor::class)
@@ -44,10 +47,9 @@ abstract class WalkMarkDatabase : RoomDatabase() {
     abstract fun walkPointDao(): WalkPointDao
     abstract fun walkNoteDao(): WalkNoteDao
     abstract fun walkPhotoDao(): WalkPhotoDao
+    abstract fun syncOperationDao(): SyncOperationDao
 }
 
 @OptIn(androidx.room.ExperimentalRoomApi::class)
 @Suppress("NO_ACTUAL_FOR_EXPECT")
-expect object WalkMarkDatabaseConstructor : RoomDatabaseConstructor<WalkMarkDatabase> {
-    override fun initialize(): WalkMarkDatabase
-}
+expect object WalkMarkDatabaseConstructor : RoomDatabaseConstructor<WalkMarkDatabase>
