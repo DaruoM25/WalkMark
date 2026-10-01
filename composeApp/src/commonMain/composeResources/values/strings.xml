@@ -23,4 +23,16 @@
     <string name="faq_privacy_answer">Walk data is stored locally on your device. WalkMark does not silently upload routes, locations, notes, photos, logs, or diagnostics.</string>
     <string name="faq_contact_question">How do I contact support?</string>
     <string name="faq_contact_answer">If a support email is configured for this build, use Contact support by email. You review and send the message in your email application.</string>
+
+    <string name="saved_walks_entry">Saved Walks</string>
+    <string name="saved_walks_title">Saved Walks</string>
+    <string name="saved_walks_back">Back</string>
+
+    <string name="export_gpx_button">Export / Share GPX</string>
+    <string name="export_gpx_exporting">Preparing your GPX export…</string>
+    <string name="export_gpx_success">Exported %1$s</string>
+    <string name="export_gpx_no_walks">No saved walks yet. Record a walk to export it as a GPX file.</string>
+    <string name="export_gpx_error_walk_not_found">That walk is no longer available on this device.</string>
+    <string name="export_gpx_error_no_app">No application is available to receive the GPX file.</string>
+    <string name="export_gpx_error_share_failed">The GPX file could not be shared.</string>
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Exported GPX documents are written to the app-private cache only. -->
+    <cache-path
+        name="walkmark_gpx"
+        path="walkmark-gpx/" />
+</paths>
