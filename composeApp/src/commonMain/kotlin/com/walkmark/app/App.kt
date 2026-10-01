@@ -34,7 +34,7 @@ import com.walkmark.app.data.location.DefaultLocationRepository
 import com.walkmark.app.data.media.createLocalMediaStore
 import com.walkmark.app.data.monetization.UnavailableSubscriptionManager
 import com.walkmark.app.data.monetization.WalkRepositoryWalkCount
-import com.walkmark.app.data.repository.RoomWalkRepository
+import com.walkmark.app.data.walk.RoomWalkRepository
 import com.walkmark.app.data.walk.WalkSessionRecorder
 import com.walkmark.app.domain.auth.AuthRepository
 import com.walkmark.app.domain.location.LocationRepository
@@ -51,13 +51,13 @@ import com.walkmark.app.presentation.adaptive.AdaptiveWalkScaffold
 import com.walkmark.app.presentation.adaptive.DevicePosture
 import com.walkmark.app.presentation.auth.AuthScreen
 import com.walkmark.app.presentation.auth.AuthViewModel
+import com.walkmark.app.presentation.journal.LocalWalkViewModel
 import com.walkmark.app.presentation.journal.WalkDetailScreen
 import com.walkmark.app.presentation.journal.WalkHistoryScreen
+import com.walkmark.app.presentation.journal.WalkViewModel
 import com.walkmark.app.presentation.journal.deletionNotice
 import com.walkmark.app.presentation.location.LocationViewModel
-import com.walkmark.app.presentation.location.LocalWalkViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
-import com.walkmark.app.presentation.location.WalkViewModel
 import com.walkmark.app.presentation.paywall.HardPaywallSheet
 import com.walkmark.app.presentation.paywall.HardPaywallUiState
 import com.walkmark.app.presentation.settings.SettingsScreen
