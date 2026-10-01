@@ -2,15 +2,15 @@ package com.walkmark.app.presentation.export.structured
 
 import android.content.Intent
 import android.net.Uri
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.io.File
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -35,7 +35,9 @@ class StructuredExportShareLauncherTest {
 
         assertEquals(Intent.ACTION_SEND, intent.action)
         assertEquals("application/json", intent.type)
-        assertEquals(contentUri, intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java))
+        val streamUri = (intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri)
+            ?: (intent.extras?.get(Intent.EXTRA_STREAM) as? Uri)
+        assertEquals(contentUri, streamUri)
         assertEquals("walk_123.json", intent.getStringExtra(Intent.EXTRA_SUBJECT))
         assertTrue((intent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION) != 0)
     }
@@ -51,7 +53,9 @@ class StructuredExportShareLauncherTest {
 
         assertEquals(Intent.ACTION_SEND, intent.action)
         assertEquals("text/csv", intent.type)
-        assertEquals(contentUri, intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java))
+        val streamUri = (intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri)
+            ?: (intent.extras?.get(Intent.EXTRA_STREAM) as? Uri)
+        assertEquals(contentUri, streamUri)
         assertEquals("walk_123.csv", intent.getStringExtra(Intent.EXTRA_SUBJECT))
         assertTrue((intent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION) != 0)
     }
@@ -65,10 +69,11 @@ class StructuredExportShareLauncherTest {
             fileName = "walk_123.json"
         )
 
-        val streamUri = intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+        val streamUri = (intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri)
+            ?: (intent.extras?.get(Intent.EXTRA_STREAM) as? Uri)
         assertNotNull(streamUri)
-        assertEquals("content", streamUri.scheme)
-        assertFalse(streamUri.scheme == "file")
+        assertEquals("content", streamUri?.scheme)
+        assertFalse(streamUri?.scheme == "file")
     }
 
     @Test
