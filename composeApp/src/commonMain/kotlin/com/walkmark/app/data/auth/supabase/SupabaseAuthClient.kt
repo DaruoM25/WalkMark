@@ -90,14 +90,13 @@ internal class DefaultSupabaseAuthClient(
         AuthOperationResult.Failure(SupabaseAuthErrorMapper.map(throwable))
     }
 
-    private fun mapSession(status: SessionStatus): AuthSessionState = when (status) {
-        SessionStatus.Initializing -> AuthSessionState.Restoring
-        is SessionStatus.NotAuthenticated -> AuthSessionState.Guest
-        is SessionStatus.RefreshFailure -> AuthSessionState.Guest
-        is SessionStatus.Authenticated -> status.session.user
+    private fun mapSession(status: SessionStatus): AuthSessionState = when {
+        status is SessionStatus.Authenticated -> status.session.user
             ?.toDomainUser()
             ?.let(AuthSessionState::Authenticated)
             ?: AuthSessionState.Guest
+        status::class.simpleName == "Initializing" -> AuthSessionState.Restoring
+        else -> AuthSessionState.Guest
     }
 
     private fun User.toDomainUser(): AuthUser = mapSupabaseUser(id = id, email = email)

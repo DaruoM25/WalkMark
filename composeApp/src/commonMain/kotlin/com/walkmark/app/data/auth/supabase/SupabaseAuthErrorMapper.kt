@@ -3,17 +3,23 @@ package com.walkmark.app.data.auth.supabase
 import com.walkmark.app.domain.auth.AuthFailure
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.github.jan.supabase.exceptions.RestException
 
 internal object SupabaseAuthErrorMapper {
 
     fun map(throwable: Throwable): AuthFailure = when (throwable) {
         is AuthRestException -> mapAuthCode(throwable.error)
-        is HttpRequestTimeoutException,
-        is HttpRequestException,
-        -> AuthFailure.Network
+        is RestException -> mapAuthCode(throwable.error)
+        is HttpRequestException -> AuthFailure.Network
         is IllegalArgumentException -> AuthFailure.InvalidInput
-        else -> AuthFailure.Unknown
+        else -> {
+            val name = throwable::class.simpleName ?: ""
+            if (name.contains("Timeout") || name.contains("Socket") || name.contains("Network") || name.contains("Connect")) {
+                AuthFailure.Network
+            } else {
+                AuthFailure.Unknown
+            }
+        }
     }
 
     fun mapAuthCode(code: String): AuthFailure = when (code) {
