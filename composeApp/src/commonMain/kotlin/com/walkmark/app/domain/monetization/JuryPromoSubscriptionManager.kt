@@ -3,10 +3,11 @@ package com.walkmark.app.domain.monetization
 import com.walkmark.app.domain.promo.JuryPromoManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
 
 class JuryPromoSubscriptionManager(
     private val base: SubscriptionManager,
@@ -14,31 +15,31 @@ class JuryPromoSubscriptionManager(
     scope: CoroutineScope? = null
 ) : SubscriptionManager {
 
-    private val _subscriptionState = MutableStateFlow(base.subscriptionState.value)
-    override val subscriptionState: StateFlow<SubscriptionState> = _subscriptionState.asStateFlow()
+    private val _manualState = MutableStateFlow(
+        if (promoManager.isJuryAccessActive.value) SubscriptionState.entitled() else base.subscriptionState.value
+    )
+
+    private val combinedFlow: StateFlow<SubscriptionState>? = scope?.let { coroutineScope ->
+        combine(base.subscriptionState, promoManager.isJuryAccessActive) { baseState, promoActive ->
+            if (promoActive) {
+                SubscriptionState.entitled()
+            } else {
+                baseState
+            }
+        }.stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = if (promoManager.isJuryAccessActive.value) SubscriptionState.entitled() else base.subscriptionState.value
+        )
+    }
+
+    override val subscriptionState: StateFlow<SubscriptionState>
+        get() = combinedFlow ?: _manualState
 
     override val offerings: StateFlow<OfferingsState> = base.offerings
 
-    init {
-        if (scope != null) {
-            scope.launch {
-                combine(base.subscriptionState, promoManager.isJuryAccessActive) { baseState, promoActive ->
-                    if (promoActive) {
-                        SubscriptionState.entitled()
-                    } else {
-                        baseState
-                    }
-                }.collect {
-                    _subscriptionState.value = it
-                }
-            }
-        } else {
-            updateState()
-        }
-    }
-
     private fun updateState() {
-        _subscriptionState.value = if (promoManager.isJuryAccessActive.value) {
+        _manualState.value = if (promoManager.isJuryAccessActive.value) {
             SubscriptionState.entitled()
         } else {
             base.subscriptionState.value
@@ -52,14 +53,13 @@ class JuryPromoSubscriptionManager(
 
     override suspend fun refresh(): SubscriptionState {
         val baseState = base.refresh()
-        return if (promoManager.isJuryAccessActive.value) {
-            val state = SubscriptionState.entitled()
-            _subscriptionState.value = state
-            state
+        val state = if (promoManager.isJuryAccessActive.value) {
+            SubscriptionState.entitled()
         } else {
-            _subscriptionState.value = baseState
             baseState
         }
+        _manualState.value = state
+        return state
     }
 
     override suspend fun purchase(product: PaywallProduct): PurchaseResult = base.purchase(product)
