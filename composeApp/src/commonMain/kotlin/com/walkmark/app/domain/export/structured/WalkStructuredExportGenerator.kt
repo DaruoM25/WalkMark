@@ -1,9 +1,9 @@
 package com.walkmark.app.domain.export.structured
 
-import com.walkmark.app.core.model.LocationPoint
-import com.walkmark.app.core.model.Walk
-import com.walkmark.app.core.model.WalkNote
-import com.walkmark.app.core.model.WalkPhoto
+import com.walkmark.app.domain.location.LocationPoint
+import com.walkmark.app.domain.walk.Walk
+import com.walkmark.app.domain.walk.WalkNote
+import com.walkmark.app.domain.walk.WalkPhoto
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,8 +18,8 @@ internal data class WalkExportDto(
     val endTime: Long?,
     val durationSeconds: Long,
     val distanceMeters: Double,
-    val isAutoPaused: Boolean,
-    val isClosedPrematurely: Boolean,
+    val isAutoPaused: Boolean = false,
+    val isClosedPrematurely: Boolean = false,
     val routePoints: List<RoutePointExportDto>,
     val notes: List<NoteExportDto>,
     val photos: List<PhotoExportDto>
@@ -47,8 +47,8 @@ internal data class NoteExportDto(
 @Serializable
 internal data class PhotoExportDto(
     val id: String,
-    val mimeType: String,
-    val byteSize: Long,
+    val mimeType: String = "image/jpeg",
+    val byteSize: Long = 0L,
     val createdAt: Long,
     val latitude: Double?,
     val longitude: Double?
@@ -73,12 +73,12 @@ object WalkStructuredExportGenerator {
             id = walk.id,
             title = walk.title,
             status = walk.status.name,
-            startTime = walk.startTime,
-            endTime = walk.endTime,
+            startTime = walk.startTimeEpochMs,
+            endTime = walk.endTimeEpochMs,
             durationSeconds = walk.durationSeconds,
-            distanceMeters = walk.distanceMeters,
-            isAutoPaused = walk.isAutoPaused,
-            isClosedPrematurely = walk.isClosedPrematurely,
+            distanceMeters = walk.totalDistanceMeters,
+            isAutoPaused = false,
+            isClosedPrematurely = false,
             routePoints = points.mapIndexed { index, point ->
                 RoutePointExportDto(
                     sequence = index,
@@ -86,14 +86,14 @@ object WalkStructuredExportGenerator {
                     longitude = point.longitude,
                     altitude = point.altitude,
                     timestamp = point.timestamp,
-                    accuracy = point.accuracy
+                    accuracy = if (point.accuracy > 0f) point.accuracy else null
                 )
             },
             notes = notes.map { note ->
                 NoteExportDto(
                     id = note.id,
-                    content = note.content,
-                    createdAt = note.createdAt,
+                    content = note.text,
+                    createdAt = note.createdAtEpochMs,
                     latitude = note.latitude,
                     longitude = note.longitude
                 )
@@ -101,9 +101,9 @@ object WalkStructuredExportGenerator {
             photos = photos.map { photo ->
                 PhotoExportDto(
                     id = photo.id,
-                    mimeType = photo.mimeType,
-                    byteSize = photo.byteSize,
-                    createdAt = photo.createdAt,
+                    mimeType = "image/jpeg",
+                    byteSize = 0L,
+                    createdAt = photo.createdAtEpochMs,
                     latitude = photo.latitude,
                     longitude = photo.longitude
                 )
@@ -121,7 +121,7 @@ object WalkStructuredExportGenerator {
             val lon = formatDouble(point.longitude)
             val alt = formatDouble(point.altitude)
             val ts = point.timestamp.toString()
-            val acc = formatFloat(point.accuracy)
+            val acc = if (point.accuracy > 0f) formatFloat(point.accuracy) else ""
 
             sb.append(seq).append(',')
                 .append(lat).append(',')

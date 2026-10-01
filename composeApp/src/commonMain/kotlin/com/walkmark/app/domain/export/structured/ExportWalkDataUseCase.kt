@@ -1,9 +1,10 @@
 package com.walkmark.app.domain.export.structured
 
-import com.walkmark.app.core.model.LocationPoint
-import com.walkmark.app.core.model.WalkNote
-import com.walkmark.app.core.model.WalkPhoto
-import com.walkmark.app.domain.walk.WalkRepository
+import com.walkmark.app.domain.location.LocationPoint
+import com.walkmark.app.domain.repository.WalkRepository
+import com.walkmark.app.domain.walk.Walk
+import com.walkmark.app.domain.walk.WalkNote
+import com.walkmark.app.domain.walk.WalkPhoto
 import kotlinx.coroutines.flow.first
 
 class ExportWalkDataUseCase(

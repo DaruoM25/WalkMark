@@ -1,11 +1,12 @@
 package com.walkmark.app.domain.export.structured
 
-import com.walkmark.app.core.model.LocationPoint
-import com.walkmark.app.core.model.Walk
-import com.walkmark.app.core.model.WalkNote
-import com.walkmark.app.core.model.WalkPhoto
-import com.walkmark.app.core.model.WalkStatus
-import com.walkmark.app.domain.walk.WalkRepository
+import com.walkmark.app.domain.location.LocationPoint
+import com.walkmark.app.domain.repository.WalkRepository
+import com.walkmark.app.domain.walk.Walk
+import com.walkmark.app.domain.walk.WalkDeleteResult
+import com.walkmark.app.domain.walk.WalkNote
+import com.walkmark.app.domain.walk.WalkPhoto
+import com.walkmark.app.domain.walk.WalkStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -24,13 +25,12 @@ class WalkStructuredExportTest {
     private val sampleWalk = Walk(
         id = "walk-123",
         title = "Morning Trail Walk & Run \"Sunny\"",
-        status = WalkStatus.COMPLETED,
-        startTime = 1700000000000L,
-        endTime = 1700003600000L,
+        summary = null,
+        startTimeEpochMs = 1700000000000L,
+        endTimeEpochMs = 1700003600000L,
         durationSeconds = 3600L,
-        distanceMeters = 5420.5,
-        isAutoPaused = false,
-        isClosedPrematurely = false
+        totalDistanceMeters = 5420.5,
+        status = WalkStatus.COMPLETED
     )
 
     private val samplePoints = listOf(
@@ -44,9 +44,9 @@ class WalkStructuredExportTest {
         LocationPoint(
             latitude = 48.8570,
             longitude = 2.3530,
-            altitude = null, // Missing altitude
+            altitude = null,
             timestamp = 1700001000000L,
-            accuracy = null
+            accuracy = 0f
         ),
         LocationPoint(
             latitude = 48.8580,
@@ -61,8 +61,8 @@ class WalkStructuredExportTest {
         WalkNote(
             id = "note-1",
             walkId = "walk-123",
-            content = "Saw a deer near the lake.",
-            createdAt = 1700001500000L,
+            text = "Saw a deer near the lake.",
+            createdAtEpochMs = 1700001500000L,
             latitude = 48.8575,
             longitude = 2.3535
         )
@@ -72,10 +72,8 @@ class WalkStructuredExportTest {
         WalkPhoto(
             id = "photo-1",
             walkId = "walk-123",
-            relativePath = "photos/walk-123/img_001.jpg",
-            mimeType = "image/jpeg",
-            byteSize = 1048576L,
-            createdAt = 1700002500000L,
+            uri = "content://media/photos/1",
+            createdAtEpochMs = 1700002500000L,
             latitude = 48.8580,
             longitude = 2.3540
         )
@@ -92,13 +90,20 @@ class WalkStructuredExportTest {
         var observeNotesCalls = 0
         var observePhotosCalls = 0
 
-        override suspend fun getWalk(id: String): Walk? {
+        override suspend fun getWalk(walkId: String): Walk? {
             getWalkCalls++
-            return if (walk?.id == id) walk else null
+            return if (walk?.id == walkId) walk else null
         }
 
-        override fun observeWalkById(id: String): Flow<Walk?> = flowOf(if (walk?.id == id) walk else null)
+        override suspend fun startWalk(walkId: String, title: String, startTimeEpochMs: Long): Walk = throw UnsupportedOperationException("Read only")
+        override suspend fun completeWalk(walkId: String, endTimeEpochMs: Long, totalDistanceMeters: Double): Walk? = throw UnsupportedOperationException("Read only")
+        override suspend fun appendPoints(walkId: String, points: List<LocationPoint>) = throw UnsupportedOperationException("Read only")
+        override suspend fun addNote(note: WalkNote) = throw UnsupportedOperationException("Read only")
+        override suspend fun addPhoto(photo: WalkPhoto) = throw UnsupportedOperationException("Read only")
+        override suspend fun getActiveWalk(): Walk? = null
         override fun observeAllWalks(): Flow<List<Walk>> = flowOf(listOfNotNull(walk))
+        override fun observeActiveWalk(): Flow<Walk?> = flowOf(null)
+        override fun observeWalkById(walkId: String): Flow<Walk?> = flowOf(if (walk?.id == walkId) walk else null)
         override fun observePoints(walkId: String): Flow<List<LocationPoint>> {
             observePointsCalls++
             return flowOf(points)
@@ -111,15 +116,7 @@ class WalkStructuredExportTest {
             observePhotosCalls++
             return flowOf(photos)
         }
-
-        override suspend fun insertWalk(walk: Walk) = throw UnsupportedOperationException("Read only")
-        override suspend fun updateWalk(walk: Walk) = throw UnsupportedOperationException("Read only")
-        override suspend fun deleteWalk(walkId: String) = throw UnsupportedOperationException("Read only")
-        override suspend fun insertPoint(walkId: String, point: LocationPoint) = throw UnsupportedOperationException("Read only")
-        override suspend fun insertNote(note: WalkNote) = throw UnsupportedOperationException("Read only")
-        override suspend fun deleteNote(noteId: String) = throw UnsupportedOperationException("Read only")
-        override suspend fun insertPhoto(photo: WalkPhoto) = throw UnsupportedOperationException("Read only")
-        override suspend fun deletePhoto(photoId: String) = throw UnsupportedOperationException("Read only")
+        override suspend fun deleteWalk(walkId: String): WalkDeleteResult = throw UnsupportedOperationException("Read only")
     }
 
     @Test
@@ -146,7 +143,6 @@ class WalkStructuredExportTest {
         val result = useCase("walk-123", WalkExportFormat.JSON)
         assertIs<WalkStructuredExportResult.Success>(result)
 
-        // Verifying valid JSON escaping allows re-parsing
         val parsed = Json.parseToJsonElement(result.content).jsonObject
         assertNotNull(parsed)
         assertEquals("Morning Trail Walk & Run \"Sunny\"", parsed["title"]?.jsonPrimitive?.content)
@@ -162,7 +158,7 @@ class WalkStructuredExportTest {
         assertIs<WalkStructuredExportResult.Success>(result)
 
         assertFalse(result.content.contains("relativePath"))
-        assertFalse(result.content.contains("photos/walk-123/img_001.jpg"))
+        assertFalse(result.content.contains("content://media/photos/1"))
         assertFalse(result.content.contains("/data/"))
         assertFalse(result.content.contains("C:\\"))
     }
@@ -221,7 +217,7 @@ class WalkStructuredExportTest {
                 longitude = 20.0,
                 altitude = null,
                 timestamp = 1700000000000L,
-                accuracy = null
+                accuracy = 0f
             )
         )
         val repo = ReadOnlyFakeRepository(sampleWalk, points)
