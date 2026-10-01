@@ -4,10 +4,10 @@ import android.content.Context
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
-import com.revenuecat.purchases.getCustomerInfoWith
+import com.revenuecat.purchases.PurchasesError
+import com.revenuecat.purchases.interfaces.LogInCallback
+import com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback
 import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
-import com.revenuecat.purchases.logInWith
-import com.revenuecat.purchases.logOutWith
 import com.walkmark.app.domain.auth.AuthRepository
 import com.walkmark.app.domain.auth.AuthSessionState
 import com.walkmark.app.domain.monetization.OfferingsState
@@ -93,11 +93,16 @@ class RevenueCatSubscriptionManager(
     internal fun loginUser(userId: String) {
         if (!isConfigured || !Purchases.isConfigured) return
         try {
-            Purchases.sharedInstance.logInWith(
-                userId = userId,
-                onError = { /* Keep current state */ },
-                onSuccess = { customerInfo, _ ->
-                    _subscriptionState.value = mapCustomerInfo(customerInfo)
+            Purchases.sharedInstance.logIn(
+                userId,
+                object : LogInCallback {
+                    override fun onReceived(customerInfo: CustomerInfo, created: Boolean) {
+                        _subscriptionState.value = mapCustomerInfo(customerInfo)
+                    }
+
+                    override fun onError(error: PurchasesError) {
+                        // Keep current state on error
+                    }
                 }
             )
         } catch (e: Throwable) {
@@ -109,10 +114,15 @@ class RevenueCatSubscriptionManager(
         if (!isConfigured || !Purchases.isConfigured) return
         try {
             if (!Purchases.sharedInstance.isAnonymous) {
-                Purchases.sharedInstance.logOutWith(
-                    onError = { /* Ignore */ },
-                    onSuccess = { customerInfo ->
-                        _subscriptionState.value = mapCustomerInfo(customerInfo)
+                Purchases.sharedInstance.logOut(
+                    object : ReceiveCustomerInfoCallback {
+                        override fun onReceived(customerInfo: CustomerInfo) {
+                            _subscriptionState.value = mapCustomerInfo(customerInfo)
+                        }
+
+                        override fun onError(error: PurchasesError) {
+                            // Ignore
+                        }
                     }
                 )
             }
@@ -123,7 +133,8 @@ class RevenueCatSubscriptionManager(
 
     internal fun mapCustomerInfo(customerInfo: CustomerInfo?): SubscriptionState {
         if (customerInfo == null) return SubscriptionState.free()
-        val isEntitled = customerInfo.entitlements[ENTITLEMENT_PREMIUM]?.isActive == true
+        val isEntitled = customerInfo.entitlements.all[ENTITLEMENT_PREMIUM]?.isActive == true ||
+            customerInfo.entitlements.active.containsKey(ENTITLEMENT_PREMIUM)
         return if (isEntitled) {
             SubscriptionState.entitled()
         } else {
@@ -142,16 +153,19 @@ class RevenueCatSubscriptionManager(
         }
         return suspendCancellableCoroutine { continuation ->
             try {
-                Purchases.sharedInstance.getCustomerInfoWith(
-                    onError = {
-                        val state = SubscriptionState.free()
-                        _subscriptionState.value = state
-                        if (continuation.isActive) continuation.resume(state)
-                    },
-                    onSuccess = { customerInfo ->
-                        val state = mapCustomerInfo(customerInfo)
-                        _subscriptionState.value = state
-                        if (continuation.isActive) continuation.resume(state)
+                Purchases.sharedInstance.getCustomerInfo(
+                    object : ReceiveCustomerInfoCallback {
+                        override fun onReceived(customerInfo: CustomerInfo) {
+                            val state = mapCustomerInfo(customerInfo)
+                            _subscriptionState.value = state
+                            if (continuation.isActive) continuation.resume(state)
+                        }
+
+                        override fun onError(error: PurchasesError) {
+                            val state = SubscriptionState.free()
+                            _subscriptionState.value = state
+                            if (continuation.isActive) continuation.resume(state)
+                        }
                     }
                 )
             } catch (e: Throwable) {
