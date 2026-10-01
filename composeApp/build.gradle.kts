@@ -79,7 +79,24 @@ android {
     namespace = "com.walkmark.app"
     compileSdk = 35
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
+        val supabaseUrl = (project.findProperty("SUPABASE_URL") as? String)
+            ?: System.getenv("SUPABASE_URL")
+            ?: ""
+        val supabaseAnonKey = (project.findProperty("SUPABASE_ANON_KEY") as? String)
+            ?: System.getenv("SUPABASE_ANON_KEY")
+            ?: ""
+        val revenueCatKey = (project.findProperty("REVENUECAT_PUBLIC_KEY") as? String)
+            ?: System.getenv("REVENUECAT_PUBLIC_KEY")
+            ?: ""
+
+        buildConfigField("String", "SUPABASE_URL", "\"\$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"\$supabaseAnonKey\"")
+        buildConfigField("String", "REVENUECAT_PUBLIC_KEY", "\"\$revenueCatKey\"")
         applicationId = "com.walkmark.app"
         minSdk = 26
         targetSdk = 35
