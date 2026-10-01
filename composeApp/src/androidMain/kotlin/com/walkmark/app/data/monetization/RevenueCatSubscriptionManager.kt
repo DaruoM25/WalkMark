@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCancellableCoroutine
 
 class RevenueCatSubscriptionManager(
     private val context: Context,
@@ -34,7 +34,7 @@ class RevenueCatSubscriptionManager(
     private val _subscriptionState = MutableStateFlow(SubscriptionState.unknown(isLoading = false))
     override val subscriptionState: StateFlow<SubscriptionState> = _subscriptionState.asStateFlow()
 
-    private val _offerings = MutableStateFlow<OfferingsState>(OfferingsState.Empty)
+    private val _offerings = MutableStateFlow<OfferingsState>(OfferingsState.NotLoaded)
     override val offerings: StateFlow<OfferingsState> = _offerings.asStateFlow()
 
     private var isConfigured = false

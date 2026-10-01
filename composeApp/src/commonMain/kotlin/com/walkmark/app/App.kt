@@ -33,8 +33,8 @@ import com.walkmark.app.data.auth.UnavailableAuthRepository
 import com.walkmark.app.data.location.DefaultLocationRepository
 import com.walkmark.app.data.media.createLocalMediaStore
 import com.walkmark.app.data.monetization.UnavailableSubscriptionManager
+import com.walkmark.app.data.monetization.WalkRepositoryWalkCount
 import com.walkmark.app.data.repository.RoomWalkRepository
-import com.walkmark.app.data.walk.WalkRepositoryWalkCount
 import com.walkmark.app.data.walk.WalkSessionRecorder
 import com.walkmark.app.domain.auth.AuthRepository
 import com.walkmark.app.domain.location.LocationRepository
@@ -47,7 +47,6 @@ import com.walkmark.app.domain.repository.LocalMediaStore
 import com.walkmark.app.domain.repository.WalkRepository
 import com.walkmark.app.domain.walk.StartWalkUseCase
 import com.walkmark.app.domain.walk.WalkStartResult
-import com.walkmark.app.presentation.adaptive.AdaptiveLayout
 import com.walkmark.app.presentation.adaptive.AdaptiveWalkScaffold
 import com.walkmark.app.presentation.adaptive.DevicePosture
 import com.walkmark.app.presentation.auth.AuthScreen
@@ -56,7 +55,9 @@ import com.walkmark.app.presentation.journal.WalkDetailScreen
 import com.walkmark.app.presentation.journal.WalkHistoryScreen
 import com.walkmark.app.presentation.journal.deletionNotice
 import com.walkmark.app.presentation.location.LocationViewModel
+import com.walkmark.app.presentation.location.LocalWalkViewModel
 import com.walkmark.app.presentation.location.TrackingScreen
+import com.walkmark.app.presentation.location.WalkViewModel
 import com.walkmark.app.presentation.paywall.HardPaywallSheet
 import com.walkmark.app.presentation.paywall.HardPaywallUiState
 import com.walkmark.app.presentation.settings.SettingsScreen
@@ -64,8 +65,6 @@ import com.walkmark.app.presentation.settings.SettingsViewModel
 import com.walkmark.app.presentation.support.SupportContactConfig
 import com.walkmark.app.presentation.support.SupportScreen
 import com.walkmark.app.presentation.theme.WalkMarkTheme
-import com.walkmark.app.presentation.walk.LocalWalkViewModel
-import com.walkmark.app.presentation.walk.WalkViewModel
 import org.jetbrains.compose.resources.stringResource
 import walkmark.composeapp.generated.resources.Res
 import walkmark.composeapp.generated.resources.settings_entry
@@ -74,10 +73,10 @@ import walkmark.composeapp.generated.resources.support_entry
 private enum class RootDestination {
     Main,
     Settings,
+    Account,
     Support,
     History,
-    Detail,
-    Account
+    Detail
 }
 
 @Composable
@@ -85,11 +84,11 @@ fun App(
     locationRepository: LocationRepository? = null,
     walkRepository: WalkRepository? = null,
     mediaStore: LocalMediaStore? = null,
-    supportContactConfig: SupportContactConfig = SupportContactConfig.NotConfigured,
-    posture: DevicePosture = DevicePosture.Normal,
-    subscriptionManager: SubscriptionManager? = null,
     authRepository: AuthRepository? = null,
-    juryPromoManager: JuryPromoManager? = null
+    subscriptionManager: SubscriptionManager? = null,
+    juryPromoManager: JuryPromoManager? = null,
+    supportContactConfig: SupportContactConfig = SupportContactConfig.NotConfigured,
+    posture: DevicePosture = DevicePosture.Normal
 ) {
     WalkMarkTheme {
         Surface(
