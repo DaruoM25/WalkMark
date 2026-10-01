@@ -1,6 +1,7 @@
 package com.walkmark.app.data.auth.supabase
 
 import com.walkmark.app.domain.auth.AuthFailure
+import io.github.jan.supabase.auth.exception.AuthRestException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -39,6 +40,34 @@ class SupabaseAuthErrorMapperTest {
         assertEquals(
             AuthFailure.InvalidInput,
             SupabaseAuthErrorMapper.map(IllegalArgumentException()),
+        )
+    }
+
+    @Test
+    fun authRestExceptionWithKnownCodeMapsToTypedDomainFailure() {
+        assertEquals(
+            AuthFailure.InvalidCredentials,
+            SupabaseAuthErrorMapper.map(
+                AuthRestException(
+                    errorCode = "invalid_credentials",
+                    message = "raw provider detail that must not reach the domain",
+                    statusCode = 400,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun authRestExceptionWithUnmappedCodeFallsBackToUnknown() {
+        assertEquals(
+            AuthFailure.Unknown,
+            SupabaseAuthErrorMapper.map(
+                AuthRestException(
+                    errorCode = "provider_detail_not_in_domain",
+                    message = "raw provider detail that must not reach the domain",
+                    statusCode = 500,
+                ),
+            ),
         )
     }
 

@@ -8,7 +8,7 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 internal object SupabaseAuthErrorMapper {
 
     fun map(throwable: Throwable): AuthFailure = when (throwable) {
-        is AuthRestException -> mapAuthCode(throwable.errorCode.value)
+        is AuthRestException -> mapAuthCode(throwable.errorCode?.value ?: throwable.error)
         is HttpRequestTimeoutException,
         is HttpRequestException,
         -> AuthFailure.Network
