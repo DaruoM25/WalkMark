@@ -44,7 +44,15 @@ jobs:
         run: chmod +x gradlew
 
       - name: 1. Compile Android Debug
-        run: ./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon --stacktrace
+        run: |
+          ./gradlew :composeApp:compileDebugKotlinAndroid --no-daemon --stacktrace > compile_log.txt 2>&1 || {
+            echo "### Compile Error Log" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -E "e: |error:|FAILED" compile_log.txt -B 2 -A 5 | head -n 100 >> $GITHUB_STEP_SUMMARY || cat compile_log.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat compile_log.txt
+            exit 1
+          }
 
       - name: 2. Run Android Unit Tests
         run: ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace
