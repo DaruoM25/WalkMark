@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.walkmark.app.core.database.WalkMarkDatabase
 import com.walkmark.app.core.database.WalkMarkMigrations
+import com.walkmark.app.core.database.createRoomDatabase
 import com.walkmark.app.core.database.getInMemoryDatabaseBuilder
 import com.walkmark.app.domain.location.LocationPoint
 import com.walkmark.app.domain.walk.WalkNote
@@ -230,9 +231,9 @@ class WalkPersistenceIntegrationTest {
     private fun fileBackedDatabase(
         context: android.content.Context,
         name: String
-    ): WalkMarkDatabase = Room.databaseBuilder(context, WalkMarkDatabase::class.java, name)
-        .addMigrations(WalkMarkMigrations.MIGRATION_1_2)
-        .build()
+    ): WalkMarkDatabase = createRoomDatabase(
+        Room.databaseBuilder(context, WalkMarkDatabase::class.java, name)
+    )
 
     @Test
     fun deletingWalkCascadesToPointsNotesAndPhotos() = runTest {
