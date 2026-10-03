@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WalkMark</string>
     <string name="nav_home">Home</string>
@@ -39,5 +40,48 @@
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
+    <string name="support_entry">Help &amp; Support</string>
+    <string name="support_title">Help &amp; Support</string>
     <string name="support_help">Help &amp; Support</string>
+    <string name="support_back">Back</string>
+    <string name="support_privacy_notice">Opening Help &amp; Support collects and sends nothing. Your walks, routes, locations, notes, and photos remain on this device unless you explicitly choose to share them.</string>
+    <string name="support_faq_heading">Frequently asked questions</string>
+    <string name="support_contact_button">Contact support by email</string>
+    <string name="support_contact_not_configured">Email support is not available in this build.</string>
+    <string name="support_contact_no_app">No compatible email application is available.</string>
+    <string name="support_contact_failure">The email application could not be opened.</string>
+    <string name="support_contact_subject">WalkMark support request</string>
+    <string name="support_contact_body">Describe what you need help with. WalkMark does not attach diagnostics or private walk data automatically.</string>
+    <string name="faq_getting_started_question">How do I get started?</string>
+    <string name="faq_getting_started_answer">WalkMark is a private, local-first walk journal. Start a walk from the main screen and stop it when you finish.</string>
+    <string name="faq_start_stop_question">How do I start or stop a walk?</string>
+    <string name="faq_start_stop_answer">Use Start Walk on the main screen. While recording, use Stop Walk to end the active recording.</string>
+    <string name="faq_location_permission_question">Why does WalkMark request location permission?</string>
+    <string name="faq_location_permission_answer">Location permission is required to record your route during an active walk. Grant the permission from the visible Start Walk action.</string>
+    <string name="faq_gps_question">What should I do if GPS tracking is unavailable?</string>
+    <string name="faq_gps_answer">Confirm that device location is enabled and WalkMark has location permission. Then return to the main screen and try starting the walk again.</string>
+    <string name="faq_privacy_question">Where is my walk information stored?</string>
+    <string name="faq_privacy_answer">Walk data is stored locally on your device. WalkMark does not silently upload routes, locations, notes, photos, logs, or diagnostics.</string>
+    <string name="faq_contact_question">How do I contact support?</string>
+    <string name="faq_contact_answer">If a support email is configured for this build, use Contact support by email. You review and send the message in your email application.</string>
+    <string name="settings_entry">Settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_back">Back</string>
+    <string name="settings_privacy_data_title">Privacy &amp; Local Data</string>
+    <string name="settings_privacy_data_description">WalkMark is designed local-first. All your recorded walks, GPS routes, notes, and photos are stored exclusively on this device and are never automatically uploaded to external servers.</string>
+    <string name="settings_delete_all_walks_button">Delete all local walks</string>
+    <string name="settings_delete_all_dialog_title">Delete all local walks?</string>
+    <string name="settings_delete_all_dialog_message">This action will permanently delete all walks, GPS tracks, notes, and photos stored on this device. This action cannot be undone.</string>
+    <string name="settings_delete_all_confirm">Delete all</string>
+    <string name="settings_delete_all_cancel">Cancel</string>
+    <string name="settings_delete_all_deleting">Deleting all local walks…</string>
+    <string name="settings_delete_all_success">All local walks were successfully deleted.</string>
+    <string name="settings_delete_all_no_walks">No local walks to delete.</string>
+    <string name="settings_delete_all_partial_failure">Walk records were removed, but some associated media files could not be cleaned up.</string>
+    <string name="settings_delete_all_error">An error occurred while deleting walks.</string>
+    <string name="settings_help_support_title">Help &amp; Support</string>
+    <string name="settings_help_support_description">View FAQs, troubleshooting guidance, and contact support.</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_app_name">WalkMark</string>
+    <string name="settings_about_description">A private, local-first walk journal and GPS tracker.</string>
 </resources>

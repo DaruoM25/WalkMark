@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WalkMark</string>
     <string name="nav_home">Accueil</string>
@@ -39,5 +40,48 @@
     <string name="settings_theme_system">Système</string>
     <string name="settings_theme_light">Clair</string>
     <string name="settings_theme_dark">Sombre</string>
+    <string name="support_entry">Aide &amp; Assistance</string>
+    <string name="support_title">Aide &amp; Assistance</string>
     <string name="support_help">Aide &amp; Assistance</string>
+    <string name="support_back">Retour</string>
+    <string name="support_privacy_notice">L'ouverture de l'Aide et Assistance ne collecte ni n'envoie rien. Vos marches, itinéraires, localisations, notes et photos restent sur cet appareil à moins que vous ne choisissiez explicitement de les partager.</string>
+    <string name="support_faq_heading">Foire aux questions</string>
+    <string name="support_contact_button">Contacter le support par e-mail</string>
+    <string name="support_contact_not_configured">L'assistance par e-mail n'est pas disponible dans cette version.</string>
+    <string name="support_contact_no_app">Aucune application e-mail compatible n'est disponible.</string>
+    <string name="support_contact_failure">L'application e-mail n'a pas pu être ouverte.</string>
+    <string name="support_contact_subject">Demande d'assistance WalkMark</string>
+    <string name="support_contact_body">Décrivez votre demande. WalkMark ne joint pas de diagnostics ou de données privées automatiquement.</string>
+    <string name="faq_getting_started_question">Comment commencer ?</string>
+    <string name="faq_getting_started_answer">WalkMark est un journal de marche privé et local. Démarrez une marche depuis l'écran principal et arrêtez-la quand vous avez terminé.</string>
+    <string name="faq_start_stop_question">Comment démarrer ou arrêter une marche ?</string>
+    <string name="faq_start_stop_answer">Utilisez Démarrer sur l'écran principal. Pendant l'enregistrement, utilisez Terminer pour finaliser la marche.</string>
+    <string name="faq_location_permission_question">Pourquoi WalkMark demande-t-il l'accès à la localisation ?</string>
+    <string name="faq_location_permission_answer">L'autorisation de localisation est nécessaire pour enregistrer votre itinéraire. Accordez l'autorisation lors du démarrage.</string>
+    <string name="faq_gps_question">Que faire si le suivi GPS est indisponible ?</string>
+    <string name="faq_gps_answer">Vérifiez que la localisation est activée sur l'appareil et autorisée pour WalkMark, puis réessayez.</string>
+    <string name="faq_privacy_question">Où sont stockées mes données de marche ?</string>
+    <string name="faq_privacy_answer">Vos données sont stockées localement sur votre appareil. WalkMark ne télécharge rien sur des serveurs externes sans votre accord.</string>
+    <string name="faq_contact_question">Comment contacter l'assistance ?</string>
+    <string name="faq_contact_answer">Si une adresse de support est configurée, utilisez Contacter le support par e-mail pour envoyer un message via votre messagerie.</string>
+    <string name="settings_entry">Paramètres</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_back">Retour</string>
+    <string name="settings_privacy_data_title">Confidentialité &amp; Données locales</string>
+    <string name="settings_privacy_data_description">WalkMark est conçu en mode local prioritaire. Tous vos trajets, tracés GPS, notes et photos restent sur cet appareil.</string>
+    <string name="settings_delete_all_walks_button">Supprimer toutes les marches locales</string>
+    <string name="settings_delete_all_dialog_title">Supprimer toutes les marches ?</string>
+    <string name="settings_delete_all_dialog_message">Cette action supprimera définitivement toutes les marches, tracés GPS, notes et photos enregistrés sur cet appareil. Cette action est irréversible.</string>
+    <string name="settings_delete_all_confirm">Tout supprimer</string>
+    <string name="settings_delete_all_cancel">Annuler</string>
+    <string name="settings_delete_all_deleting">Suppression des marches…</string>
+    <string name="settings_delete_all_success">Toutes les marches locales ont été supprimées.</string>
+    <string name="settings_delete_all_no_walks">Aucune marche locale à supprimer.</string>
+    <string name="settings_delete_all_partial_failure">Les marches ont été supprimées, mais certains fichiers médias n'ont pas pu être nettoyés.</string>
+    <string name="settings_delete_all_error">Une erreur est survenue lors de la suppression.</string>
+    <string name="settings_help_support_title">Aide &amp; Assistance</string>
+    <string name="settings_help_support_description">Consulter la FAQ, les guides de dépannage et contacter l'assistance.</string>
+    <string name="settings_about_title">À propos</string>
+    <string name="settings_about_app_name">WalkMark</string>
+    <string name="settings_about_description">Journal de marche et suivi GPS privé et local.</string>
 </resources>
