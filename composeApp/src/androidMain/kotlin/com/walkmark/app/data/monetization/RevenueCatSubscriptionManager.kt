@@ -1,15 +1,22 @@
 package com.walkmark.app.data.monetization
 
+import android.app.Activity
 import android.content.Context
 import com.revenuecat.purchases.CustomerInfo
+import com.revenuecat.purchases.Offerings
+import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import com.revenuecat.purchases.PurchasesError
 import com.revenuecat.purchases.interfaces.LogInCallback
+import com.revenuecat.purchases.interfaces.PurchaseCallback
 import com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback
+import com.revenuecat.purchases.interfaces.ReceiveOfferingsCallback
 import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
+import com.revenuecat.purchases.models.StoreTransaction
 import com.walkmark.app.domain.auth.AuthRepository
 import com.walkmark.app.domain.auth.AuthSessionState
+import com.walkmark.app.domain.monetization.Offering
 import com.walkmark.app.domain.monetization.OfferingsState
 import com.walkmark.app.domain.monetization.PaywallProduct
 import com.walkmark.app.domain.monetization.PurchaseResult
@@ -64,9 +71,11 @@ class RevenueCatSubscriptionManager(
             } catch (e: Throwable) {
                 isConfigured = false
                 _subscriptionState.value = SubscriptionState.free()
+                _offerings.value = OfferingsState.Unavailable(e.message)
             }
         } else {
             _subscriptionState.value = SubscriptionState.free()
+            _offerings.value = OfferingsState.Unavailable("Missing API Key")
         }
     }
 
@@ -144,6 +153,52 @@ class RevenueCatSubscriptionManager(
 
     override suspend fun start() {
         refresh()
+        fetchOfferings()
+    }
+
+    suspend fun fetchOfferings(): OfferingsState {
+        if (!isConfigured || !Purchases.isConfigured) {
+            val state = OfferingsState.Unavailable("RevenueCat not configured")
+            _offerings.value = state
+            return state
+        }
+        return suspendCancellableCoroutine { continuation ->
+            try {
+                Purchases.sharedInstance.getOfferings(
+                    object : ReceiveOfferingsCallback {
+                        override fun onReceived(offerings: Offerings) {
+                            val current = offerings.current
+                            val state = if (current != null) {
+                                val products = current.availablePackages.map { pkg ->
+                                    PaywallProduct(
+                                        id = pkg.product.id,
+                                        title = pkg.product.title,
+                                        period = pkg.packageType.name.lowercase().replaceFirstChar { it.uppercase() },
+                                        priceFormatted = pkg.product.price.formatted,
+                                        isRecommended = pkg.packageType.name == "ANNUAL"
+                                    )
+                                }
+                                OfferingsState.Loaded(Offering(id = current.identifier, products = products))
+                            } else {
+                                OfferingsState.Unavailable("No current offering configured")
+                            }
+                            _offerings.value = state
+                            if (continuation.isActive) continuation.resume(state)
+                        }
+
+                        override fun onError(error: PurchasesError) {
+                            val state = OfferingsState.Unavailable(error.message)
+                            _offerings.value = state
+                            if (continuation.isActive) continuation.resume(state)
+                        }
+                    }
+                )
+            } catch (e: Throwable) {
+                val state = OfferingsState.Unavailable(e.message)
+                _offerings.value = state
+                if (continuation.isActive) continuation.resume(state)
+            }
+        }
     }
 
     override suspend fun refresh(): SubscriptionState {
@@ -177,10 +232,77 @@ class RevenueCatSubscriptionManager(
     }
 
     override suspend fun purchase(product: PaywallProduct): PurchaseResult {
-        return PurchaseResult.Unavailable
+        if (!isConfigured || !Purchases.isConfigured) {
+            return PurchaseResult.Unavailable
+        }
+        val activity = context as? Activity ?: return PurchaseResult.Unavailable
+        return suspendCancellableCoroutine { continuation ->
+            try {
+                Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
+                    override fun onReceived(offerings: Offerings) {
+                        val pkg = offerings.current?.availablePackages?.find { it.product.id == product.id }
+                        if (pkg != null) {
+                            Purchases.sharedInstance.purchase(
+                                PurchaseParams.Builder(activity, pkg).build(),
+                                object : PurchaseCallback {
+                                    override fun onCompleted(storeTransaction: StoreTransaction, customerInfo: CustomerInfo) {
+                                        val state = mapCustomerInfo(customerInfo)
+                                        _subscriptionState.value = state
+                                        if (continuation.isActive) continuation.resume(PurchaseResult.Completed(state))
+                                    }
+
+                                    override fun onError(error: PurchasesError, userCancelled: Boolean) {
+                                        if (userCancelled) {
+                                            if (continuation.isActive) continuation.resume(PurchaseResult.Cancelled)
+                                        } else {
+                                            if (continuation.isActive) continuation.resume(PurchaseResult.Failed(error.message))
+                                        }
+                                    }
+                                }
+                            )
+                        } else {
+                            if (continuation.isActive) continuation.resume(PurchaseResult.Failed("Product not found in current offering"))
+                        }
+                    }
+
+                    override fun onError(error: PurchasesError) {
+                        if (continuation.isActive) continuation.resume(PurchaseResult.Failed(error.message))
+                    }
+                })
+            } catch (e: Throwable) {
+                if (continuation.isActive) continuation.resume(PurchaseResult.Failed(e.message ?: "Purchase error"))
+            }
+        }
     }
 
     override suspend fun restorePurchases(): RestoreResult {
-        return RestoreResult.Unavailable
+        if (!isConfigured || !Purchases.isConfigured) {
+            return RestoreResult.Unavailable
+        }
+        return suspendCancellableCoroutine { continuation ->
+            try {
+                Purchases.sharedInstance.restorePurchases(
+                    object : ReceiveCustomerInfoCallback {
+                        override fun onReceived(customerInfo: CustomerInfo) {
+                            val state = mapCustomerInfo(customerInfo)
+                            _subscriptionState.value = state
+                            if (continuation.isActive) {
+                                if (state.isEntitled) {
+                                    continuation.resume(RestoreResult.Restored(state))
+                                } else {
+                                    continuation.resume(RestoreResult.NotRestored)
+                                }
+                            }
+                        }
+
+                        override fun onError(error: PurchasesError) {
+                            if (continuation.isActive) continuation.resume(RestoreResult.Failed(error.message))
+                        }
+                    }
+                )
+            } catch (e: Throwable) {
+                if (continuation.isActive) continuation.resume(RestoreResult.Failed(e.message ?: "Restore error"))
+            }
+        }
     }
 }
