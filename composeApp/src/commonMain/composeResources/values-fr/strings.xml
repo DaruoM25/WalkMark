@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">WalkMark</string>
+    <string name="nav_home">Accueil</string>
+    <string name="nav_history">Trajets</string>
+    <string name="nav_account">Compte</string>
+    <string name="home_title">Commencer une marche</string>
+    <string name="home_start_button">Démarrer</string>
+    <string name="home_pause_button">Pause</string>
+    <string name="home_resume_button">Reprendre</string>
+    <string name="home_finish_button">Terminer</string>
+    <string name="home_discard_button">Abandonner</string>
+    <string name="home_stat_distance">Distance</string>
+    <string name="home_stat_duration">Durée</string>
+    <string name="home_stat_pace">Allure</string>
+    <string name="home_map_overlay_tracking">Enregistrement en cours</string>
+    <string name="home_map_overlay_idle">Prêt à enregistrer</string>
+</resources>
